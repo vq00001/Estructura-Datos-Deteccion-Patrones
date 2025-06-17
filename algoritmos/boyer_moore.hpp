@@ -5,6 +5,6 @@
 #include <vector>
 
 
-void boyer_moore(const std::string &txt, const std::string &pat);
+std::vector<int> boyer_moore(const std::string &txt, const std::string &pat);
 
 #endif // BOYER_MOORE_HPP

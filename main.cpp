@@ -28,10 +28,12 @@ int main(int argc, char *argv[]){
     
     // Leer el archivo de entrada
     // Si se especifica una cantidad de archivos, se lee esa cantidad
+
+    vector<int> pos_final_archivos; // Vector para almacenar las posiciones del final de los archivos leídos
     if (argc > 5 && flag == "-f") {
-        texto = readFolder(nombre_archivo_carpeta, stoi(argv[5]));
+        texto = readFolder(nombre_archivo_carpeta, &pos_final_archivos, stoi(argv[5]));
     } else if (flag == "-f") {
-        texto = readFolder(nombre_archivo_carpeta);
+        texto = readFolder(nombre_archivo_carpeta, &pos_final_archivos);
     } else if (flag == "-a") {
         texto = readFile(nombre_archivo_carpeta);
     } else {
@@ -39,11 +41,12 @@ int main(int argc, char *argv[]){
         return 1;
     }
 
+    vector<int> posiciones;
     // Ordenar los datos según el algoritmo especificado
-    if (algoritmo == "Boyer_Moore") {
+    if (algoritmo == "Boyer-Moore") {
         startTimer();
 
-        boyer_moore(texto, patron);
+        posiciones = boyer_moore(texto, patron);
 
     } else if (algoritmo == "KMP") {
         startTimer();
@@ -55,10 +58,16 @@ int main(int argc, char *argv[]){
         cout << "Cantidad de ocurrencias del patrón: " << result << endl;
 
     } else {
-        cerr << "Algoritmo no reconocido. Ingresar alguno de los siguientes: Boyer_Moore, KMP, Robin-Karp" << endl;
+        cerr << "Algoritmo no reconocido. Ingresar alguno de los siguientes: Boyer-Moore, KMP, Robin-Karp" << endl;
         return 1;
     }
-    
+
+    cout << "\nTiempo de ejecución: ";
     stopTimer();
+
+    // Mostrar las posiciones encontradas por archivo
+    encuentros_por_archivo(nombre_archivo_carpeta, posiciones, pos_final_archivos);
+
+
     return 0;
 }

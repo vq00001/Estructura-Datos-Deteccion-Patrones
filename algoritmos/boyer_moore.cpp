@@ -17,16 +17,17 @@ void computeFullShift(int shiftArr[], int longSuffArr[], string patrn) {
     int n = patrn.size(); 
     int i = n;
     int j = n+1;
-    longSuffArr[i] = j;  // Inicializar el sufijo largo
+    longSuffArr[i] = j;  // Inicializar el sufijo largo del patrón
 
+    // Mientras quedan caracteres por procesar en el patrón
     while(i > 0) {
-        // Searching right if (i-1)th and (j-1)th item are not the same
+        // Buscar a la derecha si el elemento (i-1) y (j-1) no son iguales
         while(j <= n && patrn[i-1] != patrn[j-1] ) {
-            // to shift pattern from i to j
+            // Desplazar el patrón de i a j
             if(shiftArr[j] == 0) {
                 shiftArr[j] = j-i; 
             }
-            // Updating long suffix value
+            // Actualizar el valor del sufijo largo
             j = longSuffArr[j]; 
         }
         i--;
@@ -34,19 +35,21 @@ void computeFullShift(int shiftArr[], int longSuffArr[], string patrn) {
         longSuffArr[i] = j;
     }  
 }
-// Function for good suffix match
+
+// Funcion para computar Good Suffix 
 void computeGoodSuffix(int shiftArr[], int longSuffArr[], string patrn) {
-    // length of the pattern
-    int n = patrn.size(); 
+    
+    int n = patrn.size();  // Largo del patrón
     int j;
     j = longSuffArr[0];
-    // Looping through the pattern
+
+    // Recorrer el patrón
     for(int i = 0; i<n; i++) {
-        // setting shift to long suffix value
+        // setting shift to long suffix value 
         if(shiftArr[i] == 0) {
             shiftArr[i] = j; 
             if(i == j) {
-                // Updating long suffix value
+                // Actualizar el valor del sufijo largo
                 j = longSuffArr[j]; 
             }
         }
@@ -54,7 +57,7 @@ void computeGoodSuffix(int shiftArr[], int longSuffArr[], string patrn) {
 }
 
 // Funcion para buscar el patrón en la cadena original y almacenar las posiciones en un vector
-void searchPattern(string orgnStr, string patrn, vector<int> *array) {
+void searchPattern(string orgnStr, string patrn, vector<int> *position_array) {
     
     int patLen = patrn.size();          // Largo del patron
     int strLen = orgnStr.size();        // Largo de la cadena original
@@ -68,7 +71,8 @@ void searchPattern(string orgnStr, string patrn, vector<int> *array) {
 
     /* Llamando a la función computeFullShift y computeGoodSuffix para calcular los desplazamientos
     * La primera calcula los desplazamientos completos para el patrón y la segunda calcula los  
-    * desplazamientos de buen sufijo 
+    * desplazamientos de Good Suffix.
+    * Estas funciones son parte de la heurística del algoritmo Boyer-Moore.
     */
     computeFullShift(shiftArr, longerSuffArray, patrn); 
     computeGoodSuffix(shiftArr, longerSuffArray, patrn); 
@@ -76,21 +80,24 @@ void searchPattern(string orgnStr, string patrn, vector<int> *array) {
     int shift = 0;
     while(shift <= (strLen - patLen)) {
         int j = patLen - 1;
-        // decrement j when pattern and main string character is matching
+        // disminuir j cuando el patron y el caracter de la cadena principal coinciden
         while(j >= 0 && patrn[j] == orgnStr[shift+j]) {
             j--; 
         }
+
+        // Si j es menor que 0, significa que se encontró el patrón
         if(j < 0) {
-            // to store the position where pattern is found
-            array->push_back(shift); 
+            // almacenar la posición donde se encuentra el patrón
+            position_array->push_back(shift); 
             shift += shiftArr[0];
         }else {
-            shift += shiftArr[j+1];
+            // Si j es mayor o igual a 0, significa que no se encontró el patrón
+            shift += shiftArr[j+1]; // Desplazar el patrón según el valor de shiftArr[j+1]
         }
     }
 }
 
-void boyer_moore(const std::string &txt, const std::string &pat) {
+vector<int> boyer_moore(const std::string &txt, const std::string &pat) {
 
     // Vector para guardar las posiciones donde se encuentra el patrón
     vector<int> locArray;
@@ -99,7 +106,5 @@ void boyer_moore(const std::string &txt, const std::string &pat) {
     searchPattern(txt, pat, &locArray); 
 
     // Imprimir las posiciones donde se encuentra el patrón
-    for(int i = 0; i < locArray.size(); i++) cout << "Patron encontrado en la posicion: " << locArray[i] << endl;
-    
-    cout << "Total de ocurrencias: " << locArray.size() << endl; // Imprimir total de ocurrencias
+    return locArray;
 }

@@ -18,7 +18,7 @@ static chrono::high_resolution_clock::time_point startTime;
 
 // Función para leer archivos de una carpeta y devolver su contenido como una cadena separada por "$"
 // Si cantidadArchivos es -1, se leen todos los archivos de la carpeta
-string readFolder(const string &carpeta, int cantidadArchivos) {
+string readFolder(const string &carpeta, vector<int> *posiciones, int cantidadArchivos) {
     
     string txt = ""; // Variable para almacenar el contenido del archivo
 
@@ -44,6 +44,11 @@ string readFolder(const string &carpeta, int cantidadArchivos) {
 
         txt = txt + "$" + string((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
         file.close();
+
+        
+        // Si se pasan posiciones, agregar la posición del archivo al vector
+        posiciones->push_back(txt.size() - 1); // Agregar la posición del final del archivo
+        
 
         cantidadArchivos--; // Decrementar la cantidad de archivos restantes   
     }
@@ -75,6 +80,53 @@ string readFile(const string &archivo) {
     return txt; // Devolver el contenido del archivo como una cadena
 }
 
+void encuentros_por_archivo(const string &carpeta, const vector<int> &posiciones_patrones, const vector<int> &pos_final_archivos) {
+
+    // Verificar si la carpeta existe
+    if (!fs::exists(carpeta)) {
+        cerr << "La carpeta no existe: " << carpeta << endl;
+        return;
+    }
+
+    if (!fs::is_directory(carpeta)) {
+        cerr << "La ruta especificada no es una carpeta: " << carpeta << endl;
+        return;
+    }
+
+    // Almacenar los nombres de los archivos 
+    vector<pair<string, int>> nombres_archivos_vec;
+ 
+    for (const auto &entry : fs::directory_iterator(carpeta)) {
+        if (fs::is_regular_file(entry.path())) {
+            nombres_archivos_vec.push_back({entry.path().filename().string(), 0});
+        }
+    }
+
+    
+    size_t j = 0;
+    for (size_t i = 0; i < nombres_archivos_vec.size(); ++i) {
+        
+        if (j >= posiciones_patrones.size()) break;
+
+        // Si el archivo actual no tiene ocurrencias del patrón, continuar al siguiente
+        if(pos_final_archivos[i] < posiciones_patrones[j]) {
+            continue;
+        }
+
+        // Contar las ocurrencias del patrón en el archivo actual
+        while (j < posiciones_patrones.size() && posiciones_patrones[j] <= pos_final_archivos[i]) {
+            nombres_archivos_vec[i].second++;
+            j++;
+        }
+    }
+    
+    cout << "\nArchivo, Ocurrencias" << endl;
+    // Imprimir los resultados
+    for (auto n : nombres_archivos_vec){
+        // if (n.second == 0) continue;
+        cout << n.first << ",  " << n.second << endl;
+    }
+}
 
 // Función para iniciar el temporizador
 void startTimer() {

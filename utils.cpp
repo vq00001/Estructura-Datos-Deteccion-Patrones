@@ -25,10 +25,10 @@ string readFile(const string &carpeta, int cantidadArchivos) {
     for (const auto & entry : fs::directory_iterator(carpeta)){
 
         if (cantidadArchivos == 0) break; // Si se ha alcanzado la cantidad de archivos, salir del bucle
-        cout << "Leyendo archivo: " << entry.path().filename() << endl; // Mostrar el nombre del archivo que se está leyendo
         
-        if (!fs::is_regular_file(entry.path()))     continue; // Solo archivos
-
+        if (!fs::is_regular_file(entry.path())) continue; // Solo archivos
+        
+        cout << "Leyendo archivo: " << entry.path().filename() << endl; // Mostrar el nombre del archivo que se está leyendo
 
         if (!fs::exists(entry.path())) {
             cerr << "El archivo no existe: " << entry.path() << endl;

@@ -11,11 +11,6 @@ int main(int argc, char *argv[]){
         cerr << "Uso: " << argv[0] << " <algoritmo> <CarpetaConArchivosEntrada> <Patron> <CantidadArchivos>" << endl;
         return 1;
     }
-    cout << "cantidad de argumentos: " << argc << endl;
-    cout << "Argumentos: " << endl;
-    for (int i = 0; i < argc; i++) {
-        cout << "Argumento " << i << ": " << argv[i] << endl;
-    }
 
     // Obtener el nombre del algoritmo y el archivo de entrada
     string algoritmo = argv[1];

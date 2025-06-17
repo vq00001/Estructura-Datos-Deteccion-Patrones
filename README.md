@@ -5,6 +5,7 @@ Proyecto semestral para el ramo Estructuras de Datos.
 `g++ main.cpp utils.cpp -Ialgoritmos -o detectar_patrones.exe`
 
 ### Usar programa:
-`./detectar_patrones.exe <algoritmo> <CarpetaConArchivosEntrada> <Patron> <CantidadArchivos>`
+`./detectar_patrones.exe <algoritmo> <Patron> -<flag> <CarpetaConArchivosEntrada> <CantidadArchivos>`
 
-Por default se analizan todos los archivos de la carpeta a menos que se especifique una cantidad.
+Para analizar todos los archivos de una carpeta usar la flag `-f` y para archivos por separado usar `-a`.
+Por default se procesan todos los archivos dentro de la carpeta a menos que se especifique una cantidad.

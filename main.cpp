@@ -7,23 +7,35 @@ using namespace std;
 
 int main(int argc, char *argv[]){
 
-    if (argc < 4) {
-        cerr << "Uso: " << argv[0] << " <algoritmo> <CarpetaConArchivosEntrada> <Patron> <CantidadArchivos>" << endl;
+    if (argc < 5) {
+        cerr << "Uso: " << argv[0] << " <algoritmo> <Patron> -<flag> <CarpetaConArchivosEntrada> <CantidadArchivos>" << endl;
         return 1;
     }
 
     // Obtener el nombre del algoritmo y el archivo de entrada
+    // si el flag es -f, se busca en carpetas
+    // si el flag es -a, se busca en archivos 
     string algoritmo = argv[1];
-    string carpeta = argv[2];
-    string patron = argv[3];
+    string patron = argv[2];
+    string flag = argv[3];
+    if (flag != "-f" && flag != "-a") {
+        cerr << "Flag no reconocido. Ingresar -f para buscar en carpetas o -a para buscar en archivos." << endl;
+        return 1;
+    }
+    string nombre_archivo_carpeta = argv[4];
     string texto;
     
     // Leer el archivo de entrada
     // Si se especifica una cantidad de archivos, se lee esa cantidad
-    if (argc >= 5) {
-        texto = readFile(carpeta, stoi(argv[4]));
+    if (argc > 5 && flag == "-f") {
+        texto = readFolder(nombre_archivo_carpeta, stoi(argv[5]));
+    } else if (flag == "-f") {
+        texto = readFolder(nombre_archivo_carpeta);
+    } else if (flag == "-a") {
+        texto = readFile(nombre_archivo_carpeta);
     } else {
-        texto = readFile(carpeta);
+        cerr << "Error al leer el archivo o carpeta." << endl;
+        return 1;
     }
 
     // Ordenar los datos según el algoritmo especificado

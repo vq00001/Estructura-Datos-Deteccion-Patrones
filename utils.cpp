@@ -18,7 +18,7 @@ static chrono::high_resolution_clock::time_point startTime;
 
 // Función para leer archivos de una carpeta y devolver su contenido como una cadena separada por "$"
 // Si cantidadArchivos es -1, se leen todos los archivos de la carpeta
-string readFile(const string &carpeta, int cantidadArchivos) {
+string readFolder(const string &carpeta, int cantidadArchivos) {
     
     string txt = ""; // Variable para almacenar el contenido del archivo
 
@@ -47,6 +47,31 @@ string readFile(const string &carpeta, int cantidadArchivos) {
 
         cantidadArchivos--; // Decrementar la cantidad de archivos restantes   
     }
+    return txt; // Devolver el contenido del archivo como una cadena
+}
+
+string readFile(const string &archivo) {
+    
+    if (!fs::is_regular_file(archivo)) return ""; // Solo archivos
+    
+    cout << "Leyendo archivo: " << archivo << endl; // Mostrar el nombre del archivo que se está leyendo
+    
+    if (!fs::exists(archivo)) {
+        cerr << "El archivo no existe: " << archivo << endl;
+        return "";
+    }
+    
+    // Abrir el archivo y leer su contenido
+    ifstream file(archivo);
+
+    if (!file.is_open()) {
+        cerr << "Error al abrir el archivo: " << archivo << endl;
+        return "";
+    }
+
+    string txt = string(istreambuf_iterator<char>(file), istreambuf_iterator<char>());
+    file.close();
+    
     return txt; // Devolver el contenido del archivo como una cadena
 }
 

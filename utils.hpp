@@ -7,7 +7,8 @@
 #include <fstream>
 #include <chrono>
 
-std::string readFile(const std::string &carpeta, int cantidadArchivos = -1);
+std::string readFolder(const std::string &carpeta, int cantidadArchivos = -1);
+std::string readFile(const std::string &archivo);
 void startTimer();
 void stopTimer();
 

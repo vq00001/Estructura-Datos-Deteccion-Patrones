@@ -7,6 +7,8 @@
 */
 
 #include <bits/stdc++.h>
+#include "boyer_moore.hpp"
+
 using namespace std;
 
 // Funcion para calcular el desplazamiento completo del patrón
@@ -88,13 +90,13 @@ void searchPattern(string orgnStr, string patrn, vector<int> *array) {
     }
 }
 
-void boyer_moore(string text, string patrn) {
+void boyer_moore(const std::string &txt, const std::string &pat) {
 
     // Vector para guardar las posiciones donde se encuentra el patrón
     vector<int> locArray;
 
     // Llamar a la función de búsqueda del patrón
-    searchPattern(text, patrn, &locArray); 
+    searchPattern(txt, pat, &locArray); 
 
     // Imprimir las posiciones donde se encuentra el patrón
     for(int i = 0; i < locArray.size(); i++) cout << "Patron encontrado en la posicion: " << locArray[i] << endl;

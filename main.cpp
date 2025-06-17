@@ -1,5 +1,6 @@
 #include <bits/stdc++.h>
-#include "algoritmos/boyer_moore.cpp"
+#include "algoritmos/boyer_moore.hpp"
+#include "algoritmos/robin_karp.hpp"
 #include "utils.hpp"
 #include <filesystem>
 #include <iterator>
@@ -44,13 +45,15 @@ int main(int argc, char *argv[]){
 
         boyer_moore(texto, patron);
 
-        
     } else if (algoritmo == "KMP") {
         startTimer();
         // Implementar KMP aquí
     } else if (algoritmo == "Robin-Karp") {
         startTimer();
-        // Implementar Robin-Karp aquí
+
+        int result = robinKarp(texto, patron).size();
+        cout << "Cantidad de ocurrencias del patrón: " << result << endl;
+
     } else {
         cerr << "Algoritmo no reconocido. Ingresar alguno de los siguientes: Boyer_Moore, KMP, Robin-Karp" << endl;
         return 1;

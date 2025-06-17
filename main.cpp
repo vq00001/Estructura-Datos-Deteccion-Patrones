@@ -11,8 +11,13 @@ int main(int argc, char *argv[]){
         cerr << "Uso: " << argv[0] << " <algoritmo> <CarpetaConArchivosEntrada> <Patron> <CantidadArchivos>" << endl;
         return 1;
     }
+    cout << "cantidad de argumentos: " << argc << endl;
+    cout << "Argumentos: " << endl;
+    for (int i = 0; i < argc; i++) {
+        cout << "Argumento " << i << ": " << argv[i] << endl;
+    }
 
-     // Obtener el nombre del algoritmo y el archivo de entrada
+    // Obtener el nombre del algoritmo y el archivo de entrada
     string algoritmo = argv[1];
     string carpeta = argv[2];
     string patron = argv[3];
@@ -20,7 +25,7 @@ int main(int argc, char *argv[]){
     
     // Leer el archivo de entrada
     // Si se especifica una cantidad de archivos, se lee esa cantidad
-    if (argc < 4) {
+    if (argc >= 5) {
         texto = readFile(carpeta, stoi(argv[4]));
     } else {
         texto = readFile(carpeta);

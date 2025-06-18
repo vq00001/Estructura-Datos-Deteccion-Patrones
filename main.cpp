@@ -54,9 +54,8 @@ int main(int argc, char *argv[]){
     } else if (algoritmo == "Robin-Karp") {
         startTimer();
 
-        int result = robinKarp(texto, patron).size();
-        cout << "Cantidad de ocurrencias del patrón: " << result << endl;
-
+        posiciones = robinKarp(texto, patron);
+        
     } else {
         cerr << "Algoritmo no reconocido. Ingresar alguno de los siguientes: Boyer-Moore, KMP, Robin-Karp" << endl;
         return 1;
@@ -66,7 +65,13 @@ int main(int argc, char *argv[]){
     stopTimer();
 
     // Mostrar las posiciones encontradas por archivo
-    encuentros_por_archivo(nombre_archivo_carpeta, posiciones, pos_final_archivos);
+
+    if (flag == "-f") {
+        cout << "Archivo: " << nombre_archivo_carpeta << endl;
+        encuentros_por_archivo(nombre_archivo_carpeta, posiciones, pos_final_archivos);
+    } else {
+        cout << "Cantidad de coincidencias encontradas: " << posiciones.size() << endl;
+    }
 
 
     return 0;

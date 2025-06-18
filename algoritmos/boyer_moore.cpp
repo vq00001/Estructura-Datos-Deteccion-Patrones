@@ -13,12 +13,13 @@ using namespace std;
 
 // Funcion para calcular el desplazamiento completo del patrón
 void computeFullShift(int shiftArr[], int longSuffArr[], string patrn) {
+
     
     int n = patrn.size(); 
     int i = n;
     int j = n+1;
     longSuffArr[i] = j;  // Inicializar el sufijo largo del patrón
-
+    
     // Mientras quedan caracteres por procesar en el patrón
     while(i > 0) {
         // Buscar a la derecha si el elemento (i-1) y (j-1) no son iguales
@@ -42,7 +43,7 @@ void computeGoodSuffix(int shiftArr[], int longSuffArr[], string patrn) {
     int n = patrn.size();  // Largo del patrón
     int j;
     j = longSuffArr[0];
-
+    
     // Recorrer el patrón
     for(int i = 0; i<n; i++) {
         // setting shift to long suffix value 
@@ -88,11 +89,12 @@ void searchPattern(string orgnStr, string patrn, vector<int> *position_array) {
         // Si j es menor que 0, significa que se encontró el patrón
         if(j < 0) {
             // almacenar la posición donde se encuentra el patrón
+            // cout << shift << endl; // Imprimir la posición donde se encontró el patrón
             position_array->push_back(shift); 
-            shift += shiftArr[0];
-        }else {
+            shift += max(shiftArr[0], 1);   // Desplazar el patrón 
+        } else {
             // Si j es mayor o igual a 0, significa que no se encontró el patrón
-            shift += shiftArr[j+1]; // Desplazar el patrón según el valor de shiftArr[j+1]
+            shift += max(shiftArr[j+1], 1); // Desplazar el patrón
         }
     }
 }

@@ -123,7 +123,7 @@ void encuentros_por_archivo(const string &carpeta, const vector<int> &posiciones
     cout << "\nArchivo, Ocurrencias" << endl;
     // Imprimir los resultados
     for (auto n : nombres_archivos_vec){
-        // if (n.second == 0) continue;
+        if (n.second == 0) continue;
         cout << n.first << ",  " << n.second << endl;
     }
 }

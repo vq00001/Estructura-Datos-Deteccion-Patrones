@@ -5,8 +5,8 @@
 #include <chrono>
 #include "utils.hpp"
 #include <filesystem>
+#include "animation.hpp"
 namespace fs = std::filesystem;
-// #include "animation.hpp"
 
 #define BUFFER_SIZE 1024 // Tamaño del buffer para lectura de archivos
 
@@ -20,6 +20,9 @@ static chrono::high_resolution_clock::time_point startTime;
 // Si cantidadArchivos es -1, se leen todos los archivos de la carpeta
 string readFolder(const string &carpeta, vector<int> *posiciones, int cantidadArchivos) {
     
+    SimpleAnimator animador;
+    animador.start("\033[34mLeyendo archivos");
+
     string txt = ""; // Variable para almacenar el contenido del archivo
 
     for (const auto & entry : fs::directory_iterator(carpeta)){
@@ -28,17 +31,15 @@ string readFolder(const string &carpeta, vector<int> *posiciones, int cantidadAr
         
         if (!fs::is_regular_file(entry.path())) continue; // Solo archivos
         
-        cout << "Leyendo archivo: " << entry.path().filename() << endl; // Mostrar el nombre del archivo que se está leyendo
-
         if (!fs::exists(entry.path())) {
-            cerr << "El archivo no existe: " << entry.path() << endl;
+            animador.end("\033[31mEl archivo no existe: \033[0m" + entry.path().string());
             return "";
         }
         
         ifstream file(entry.path());
         
         if (!file.is_open()) {
-            cerr << "Error al abrir el archivo: " << entry.path() << endl;
+            animador.end("\033[31mError al abrir archivo: \033[0m" + entry.path().string());
             return "";
         }
 
@@ -52,6 +53,9 @@ string readFolder(const string &carpeta, vector<int> *posiciones, int cantidadAr
 
         cantidadArchivos--; // Decrementar la cantidad de archivos restantes   
     }
+
+    animador.end("\033[32mArchivos leídos con éxito.\033[0m"); // Terminar la animación
+
     return txt; // Devolver el contenido del archivo como una cadena
 }
 
@@ -139,8 +143,6 @@ void startTimer() {
 void stopTimer() {
     auto endTime = chrono::high_resolution_clock::now();
     auto duration = chrono::duration_cast<chrono::nanoseconds>(endTime - startTime);
-    //auto durationSeconds = chrono::duration_cast<chrono::seconds>(endTime - startTime);
-    //cout << "Tiempo transcurrido: " << duration.count() << " nanosegundos (" << durationSeconds.count() << " segundos)." << endl;
 
     if (duration.count() == 0) cerr << "ADVERTENCIA: El tiempo medido es igual a 0 ns." << endl;
 

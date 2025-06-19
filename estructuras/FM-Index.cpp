@@ -83,62 +83,58 @@ namespace FMIndex {
         }
     }
 
+    // Realiza una búsqueda hacia atrás en la BWT para encontrar el intervalo de ocurrencias del patrón
+    pair<int, int> backwardSearch(const string& pattern, const string& bwt, const vector<int>& ctable, const vector<vector<int>>& occ_table) {
+        int top = 0; // Inicio del intervalo
+        int bottom = bwt.size() - 1; // Fin del intervalo
 
-    // Función de ayuda para imprimir la tabla C de forma legible
-    void printReadableCTable(const string& bwt, const vector<int>& ctable) {
-        cout << "C-table (Readable):" << endl;
-
-        // 1. Obtener los caracteres únicos de la BWT y ordenarlos
-        string unique_chars = bwt;
-        sort(unique_chars.begin(), unique_chars.end());
-        unique_chars.erase(unique(unique_chars.begin(), unique_chars.end()), unique_chars.end());
-
-        // 2. Imprimir la entrada de la tabla C solo para esos caracteres
-        cout << "  { ";
-        bool first = true;
-        for (char c : unique_chars) {
-            if (!first) {
-                cout << ", ";
+        for (int i = pattern.size() - 1; i >= 0; --i) {
+            char c = pattern[i];
+            if (ctable[static_cast<unsigned char>(c)] == 0) {
+                return {-1, -1}; // El carácter no está en la BWT
             }
-            cout << "'" << c << "': " << ctable[static_cast<unsigned char>(c)];
-            first = false;
-        }
-        cout << " }" << endl;
-    }
 
+            // Actualizar el intervalo [top, bottom]
+            top = ctable[static_cast<unsigned char>(c)] + occ_table[static_cast<unsigned char>(c)][top];
+            bottom = ctable[static_cast<unsigned char>(c)] + occ_table[static_cast<unsigned char>(c)][bottom + 1] - 1;
 
-    void tests() {
-        // Pruebas de la implementación
-        string text = "tres tristes tigres comen trigo en un trigal";
-        string bwt_result = buildBWT(text);
-        if (bwt_result != "sosnnsnlg m rtriiirrtraoueegcgtttteeeis $    ") {
-            cout << "Error: BWT result does not match expected output." << endl;
-            return;
-        } else {
-            cout << "BWT test passed!" << endl;
-        }
-        cout << "BWT of '" << text << "' is:(" << bwt_result << ")." << endl;
-        vector<int> ctable;
-        buildCTable(bwt_result, ctable);
-        printReadableCTable(bwt_result, ctable);
-        cout << endl;
-        vector<vector<int>> occ_table;
-        buildOccTable(bwt_result, occ_table);
-        cout << "OCC-table:" << endl;
-        for (int i = 0; i < 256; ++i) {
-            if (occ_table[i][bwt_result.size()] > 0) {
-                cout << "'" << char(i) << "': ";
-                for (int j = 0; j <= bwt_result.size(); ++j) {
-                    cout << occ_table[i][j] << " ";
-                }
-                cout << endl;
+            if (top > bottom) {
+                return {-1, -1}; // No se encontró el patrón
             }
         }
+
+        return {top, bottom}; // Retorna el intervalo donde se encuentra el patrón
     }
     
+    // Realiza una búsqueda de un patrón en la BWT y devuelve los índices de las ocurrencias
+    vector<int> search(const string& pattern, const string& bwt, const vector<int>& ctable, const vector<vector<int>>& occ_table) {
+        auto [top, bottom] = backwardSearch(pattern, bwt, ctable, occ_table);
+        if (top == -1) return {}; // Patrón no encontrado
+
+        // Si se encontró el patrón, construir el resultado con los índices de las ocurrencias
+        vector<int> result;
+        for (int i = top; i <= bottom; ++i) {
+            result.push_back(i); // Agregar el índice de la ocurrencia
+        }
+        return result;
+    }
 }
 
 int main() {
-    FMIndex::tests(); // Ejecutar las pruebas
+    string text = "banana de ana$";
+    string bwt = FMIndex::buildBWT(text);
+    cout << "BWT: " << bwt << endl;
+
+    vector<int> ctable;
+    FMIndex::buildCTable(bwt, ctable);
+    
+    vector<vector<int>> occ_table;
+    FMIndex::buildOccTable(bwt, occ_table);
+
+    string pattern = "ana";
+    vector<int> occurrences = FMIndex::search(pattern, bwt, ctable, occ_table);
+    
+    cout << "Veces encontrado: " << occurrences.size() << endl;
+
     return 0;
 }

@@ -2,6 +2,7 @@
 #include "algoritmos/boyer_moore.hpp"
 #include "algoritmos/KMP.hpp"
 #include "algoritmos/robin_karp.hpp"
+#include "estructuras/FM-Index.cpp"
 #include "utils.hpp"
 #include <filesystem>
 #include <iterator>
@@ -53,12 +54,18 @@ int main(int argc, char *argv[]){
         startTimer();
 
         posiciones = KMP(patron,texto);
-        // Implementar KMP aquí
+
     } else if (algoritmo == "Robin-Karp") {
         startTimer();
 
         posiciones = robinKarp(texto, patron);
 
+    } else if (algoritmo == "FM-Index") {
+        startTimer();
+
+        FMIndex fmIndex(texto);
+        posiciones = fmIndex.search(patron);
+    
     } else {
         cerr << "Algoritmo no reconocido. Ingresar alguno de los siguientes: Boyer-Moore, KMP, Robin-Karp" << endl;
         return 1;

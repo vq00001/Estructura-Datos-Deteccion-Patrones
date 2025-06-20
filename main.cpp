@@ -3,7 +3,7 @@
 #include "algoritmos/KMP.hpp"
 #include "algoritmos/robin_karp.hpp"
 #include "estructuras/FM-Index.cpp"
-#include "utils.hpp"
+#include "utils/utils.hpp"
 #include <filesystem>
 #include <iterator>
 using namespace std;

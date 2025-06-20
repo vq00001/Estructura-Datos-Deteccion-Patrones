@@ -2,6 +2,7 @@
 #include <string>
 #include <algorithm>
 #include <numeric>
+#include "../utils/SA-IS.hpp"
 
 using namespace std;
 
@@ -9,10 +10,11 @@ class FMIndex {
 private:
     // Atributos necesarios de FMIndex
 
-    string bwt;                         // Burrows-Wheeler Transform
-    vector<int> ctable;                 // Tabla C (conteo de caracteres)
-    vector<vector<int>> occ_table;      // Tabla OCC (conteo de ocurrencias)
-    vector<int> suffix_array;           // Tabla de sufijos
+    string bwt;                                     // Burrows-Wheeler Transform
+    vector<int> ctable;                             // Tabla C (conteo de caracteres)
+    vector<vector<int>> occ_checkpoint_table;       // Tabla OCC con checkpoints para optimizar memoria
+    vector<int> suffix_array;                       // Tabla de sufijos
+    static const int CHECKPOINT_INTERVAL = 64;      // Intervalo para los checkpoints en OCC
 
     // Métodos privados necesarios para la implementación de FMIndex
 
@@ -38,19 +40,8 @@ private:
         iota(suffix_array.begin(), suffix_array.end(), 0);
     
         // Paso 2: Ordenar los índices basándose en la rotación cíclica que representan. 
-        sort(suffix_array.begin(), suffix_array.end(),
-             [&](int a, int b) {
-                 // Compara las rotaciones que empiezan en 'a' y 'b'
-                 for (int i = 0; i < n; ++i) {
-                     char char_a = text[(a + i) % n];
-                     char char_b = text[(b + i) % n];
-                     if (char_a != char_b) {
-                         return char_a < char_b;
-                     }
-                 }
-                 return false; // Son idénticas
-             });
-    
+        SAIS::build_suffix_array(text, suffix_array);
+
         // Paso 3: Construir la BWT. El carácter de la BWT es el que precede al inicio de cada rotación en el texto original.
         string bwt;
         bwt.reserve(n); // Pre-reservar memoria para eficiencia
@@ -83,20 +74,41 @@ private:
     }
 
     /*
-    @brief Método que construye la tabla OCC (conteo de ocurrencias) a partir de la BWT.
+    @brief Método que construye la tabla OCC (conteo de ocurrencias) con checkpoints para ahorrar espacio.
     */
     void buildOccTable() {
-        // Construye la tabla OCC (conteo de ocurrencias)
         int n = bwt.size();
-        occ_table.assign(256, vector<int>(n + 1, 0)); // Carácteres ASCII
-    
+        int num_checkpoints = (n / CHECKPOINT_INTERVAL) + 1;
+        occ_checkpoint_table.assign(256, vector<int>(num_checkpoints, 0));
+
+        vector<int> current_counts(256, 0);
         for (int i = 0; i < n; ++i) {
-            char c = bwt[i];
-            for (int j = 0; j < 256; ++j) {
-                occ_table[j][i + 1] = occ_table[j][i]; // Copiar el valor anterior
+            current_counts[static_cast<unsigned char>(bwt[i])]++;
+            if ((i + 1) % CHECKPOINT_INTERVAL == 0) {
+                int checkpoint_idx = (i + 1) / CHECKPOINT_INTERVAL;
+                for (int j = 0; j < 256; ++j) {
+                    occ_checkpoint_table[j][checkpoint_idx] = current_counts[j];
+                }
             }
-            occ_table[c][i + 1]++; // Incrementar el conteo para el carácter actual
         }
+    }
+
+    /*
+    @brief Calcula el número de ocurrencias del carácter 'c' en el prefijo BWT[0..k-1] usando la tabla de checkpoints.
+    */
+    int getOcc(unsigned char c, int k) const {
+        if (k <= 0) return 0;
+        
+        int checkpoint_idx = k / CHECKPOINT_INTERVAL;
+        int count = occ_checkpoint_table[c][checkpoint_idx];
+        
+        int start_pos = checkpoint_idx * CHECKPOINT_INTERVAL;
+        for (int i = start_pos; i < k; ++i) {
+            if (static_cast<unsigned char>(bwt[i]) == c) {
+                count++;
+            }
+        }
+        return count;
     }
 
     /*
@@ -107,14 +119,11 @@ private:
         int bottom = bwt.size() - 1; // Fin del intervalo
     
         for (int i = pattern.size() - 1; i >= 0; --i) {
-            char c = pattern[i];
-            if (ctable[static_cast<unsigned char>(c)] == 0) {
-                return {-1, -1}; // El carácter no está en la BWT
-            }
-    
-            // Actualizar el intervalo [top, bottom]
-            top = ctable[static_cast<unsigned char>(c)] + occ_table[static_cast<unsigned char>(c)][top];
-            bottom = ctable[static_cast<unsigned char>(c)] + occ_table[static_cast<unsigned char>(c)][bottom + 1] - 1;
+            unsigned char c = pattern[i];
+            
+            // Actualizar el intervalo [top, bottom] usando getOcc
+            top = ctable[c] + getOcc(c, top);
+            bottom = ctable[c] + getOcc(c, bottom + 1) - 1;
     
             if (top > bottom) {
                 return {-1, -1}; // No se encontró el patrón
@@ -124,7 +133,7 @@ private:
         return {top, bottom}; // Retorna el intervalo donde se encuentra el patrón
     }
 
-    public:
+public:
     
     /*
     Constructor de la clase FMIndex que toma un texto y construye la BWT, la tabla C y la tabla OCC.

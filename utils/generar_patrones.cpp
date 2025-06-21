@@ -4,21 +4,8 @@ using namespace std;
 namespace fs = std::filesystem;
 
 #define NOMBRE_ARCHIVO  "patrones"
-#define CARPETA_BASE "../archivos_de_prueba/Custom"  // carpeta para generar los patrones
+#define CARPETA_BASE "../archivos_de_prueba/"  // carpeta para generar los patrones
 
-
-void guardar_(const vector<int>& vec, const string& filename) {
-    ofstream file(filename);
-    if (!file.is_open()) {
-        exit(1);
-    }
-
-    for (const auto& val : vec) {
-        file << val << " "; // Escribe cada valor en el archivo
-    }
-
-    file.close();
-}
 
 
 int generar_numero_random(long long minValue, long long maxValue){
@@ -103,6 +90,41 @@ void patron_existente(string nombre_archivo, int cant_patrones){
 }
 
 void patron_random(string nombre_archivo, int cant_patrones){
+    int largo_max = 0, largo_min = 0; // Largo maximo del patron
+    
+    cout << "Ingrese el largo minimo del patron: ";
+    cin >> largo_min;
+    if (largo_min < 1) {
+        cerr << "El largo minimo debe ser mayor a 0." << endl;
+        exit(1);
+    }
+
+    cout << "Ingrese el largo maximo del patron: ";
+    cin >> largo_max;
+    if (largo_max <= largo_min) {
+        cerr << "El largo maximo debe ser mayor a al largo minimo." << endl;
+        exit(1);
+    }
+
+    // Verificar que archivo de destino 
+    ofstream file_resultados(nombre_archivo);
+    if (!file_resultados.is_open()) {
+        exit(1);
+    }
+
+    for(int i = 0 ; i < cant_patrones; i++){
+        int largo_patron = generar_numero_random(largo_min, largo_max); // Largo del patron entre 1 y 100
+        string patron = "";
+
+        for(int j = 0; j < largo_patron; j++){
+            char c = static_cast<char>(generar_numero_random(32, 126)); // Caracteres imprimibles
+            patron += c;
+        }
+
+        file_resultados << patron << "\n" << static_cast<char>(28) << "\n"; // Escribe el patron en el archivo
+    }
+
+    file_resultados.close();
 }
 
 int main(int argc, char* argv[]){
@@ -116,9 +138,14 @@ int main(int argc, char* argv[]){
     int cantidad_patrones = stoi(argv[1]);
     string tipo_patron = argv[2];
 
+    string nombre = NOMBRE_ARCHIVO;
+    if(argc == 4){
+        nombre = argv[3];
+    }
+
     if(tipo_patron == "Random"){
-        patron_random(NOMBRE_ARCHIVO, cantidad_patrones);
+        patron_random(nombre, cantidad_patrones);
     } else if (tipo_patron == "Existente"){
-        patron_existente(NOMBRE_ARCHIVO, cantidad_patrones);
+        patron_existente(nombre, cantidad_patrones);
     }
 }

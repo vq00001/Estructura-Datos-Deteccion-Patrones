@@ -4,7 +4,9 @@ using namespace std;
 namespace fs = std::filesystem;
 
 #define NOMBRE_ARCHIVO  "patrones"
-#define CARPETA_BASE "../archivos_de_prueba/"  // carpeta para generar los patrones
+#define MAX 9999999999
+#define MIN 1
+//#define CARPETA_BASE "../archivos_de_prueba/"  // carpeta para generar los patrones
 
 
 
@@ -23,6 +25,10 @@ void enlistar_archivos(string dir_base, vector<string> *lista_archivos){
     // Recorrer todos los archivos de la carpeta base, y sus subdirectorios
 
     if (!fs::exists(dir_base) || !fs::is_directory(dir_base)) {
+        if(fs::is_regular_file(dir_base)){
+            lista_archivos->push_back(dir_base);
+            return;
+        }
         cerr << "La ruta especificada no es una carpeta o no existe: " << dir_base << endl;
         return;
     }
@@ -41,11 +47,26 @@ void enlistar_archivos(string dir_base, vector<string> *lista_archivos){
     }
 }
 
-void patron_existente(string nombre_archivo, int cant_patrones){
+void patron_existente(string nombre_archivo, int cant_patrones, string ruta){
 
+    long long largo_max = 0, largo_min = 0; // Largo maximo del patron
+    
+    cout << "Ingrese el largo minimo del patron: ";
+    cin >> largo_min;
+    if (largo_min < 1) {
+        cerr << "El largo minimo debe ser mayor a 0." << endl;
+        exit(1);
+    }
+
+    cout << "Ingrese el largo maximo del patron: ";
+    cin >> largo_max;
+    if (largo_max <= largo_min) {
+        cerr << "El largo maximo debe ser mayor a al largo minimo." << endl;
+        exit(1);
+    }
     // Hacer una lista con todos los archivos en archivos_de_prueba y sus subdirectorios
     vector<string> lista_archivos;
-    enlistar_archivos(CARPETA_BASE, &lista_archivos);
+    enlistar_archivos(ruta, &lista_archivos);
     
     // Verificar que archivo de destino 
     ofstream file_resultados(nombre_archivo);
@@ -69,7 +90,7 @@ void patron_existente(string nombre_archivo, int cant_patrones){
 
         long long tamaño_file = file.tellg();                               
         int posicion = generar_numero_random(0, tamaño_file);
-        int largo_patron = generar_numero_random(1, tamaño_file - posicion);
+        int largo_patron = generar_numero_random(largo_min, min(tamaño_file - posicion, largo_max));
 
         // ir a posicion en archivo y leer la cantidad de caracteres de largo_patron
         file.seekg(posicion); 
@@ -137,15 +158,19 @@ int main(int argc, char* argv[]){
 
     int cantidad_patrones = stoi(argv[1]);
     string tipo_patron = argv[2];
-
     string nombre = NOMBRE_ARCHIVO;
-    if(argc == 4){
+    if(argc >= 4){
         nombre = argv[3];
     }
 
     if(tipo_patron == "Random"){
         patron_random(nombre, cantidad_patrones);
     } else if (tipo_patron == "Existente"){
-        patron_existente(nombre, cantidad_patrones);
+        string ruta;
+        cout << "Ingresar nombre de ruta de archivo existente: " ;
+        cin >> ruta;
+        patron_existente(nombre, cantidad_patrones,ruta);
+    } else if(tipo_patron == "Manual"){
+        return 0;
     }
 }

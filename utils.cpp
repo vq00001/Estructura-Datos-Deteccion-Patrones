@@ -5,6 +5,7 @@
 #include <chrono>
 #include "utils.hpp"
 #include <filesystem>
+#include <string>
 namespace fs = std::filesystem;
 // #include "animation.hpp"
 
@@ -146,4 +147,35 @@ void stopTimer() {
 
     cout << duration.count() << endl; // Imprimir solo el tiempo en nanosegundos para la exportación a CSV
     startTime = endTime; // Reiniciar el temporizador para la próxima vez
+}
+
+long long getAndStopTime(){
+    auto endTime = chrono::high_resolution_clock::now();
+    auto duration = chrono::duration_cast<chrono::nanoseconds>(endTime - startTime);
+
+    if (duration.count() == 0) cerr << "ADVERTENCIA: El tiempo medido es igual a 0 ns." << endl;
+
+    long long time = duration.count() ; 
+    startTime = endTime; // Reiniciar el temporizador para la próxima vez
+    return time;
+}
+
+vector<string> readPatterns(const string &file){
+    string txt = readFile(file); //lee el archivo y lo guarad
+
+
+    std::vector<string> patterns;
+    string separador = string("\n") + static_cast<char>(28) + "\n";
+    size_t inicio = 0;
+    size_t fin = txt.find(separador,inicio);
+
+    //Itera en el texto del archivo hasta encontrar el separador establecido, y guarda el string asociado en el vector  de patrones
+    while(fin != string::npos){
+        string patron = txt.substr(inicio, fin-inicio);
+        patterns.push_back(patron);
+        inicio = fin + separador.length(); 
+        fin = txt.find(separador,inicio);
+    }
+
+    return patterns;
 }

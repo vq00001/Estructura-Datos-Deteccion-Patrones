@@ -55,7 +55,7 @@ int main(int argc, char *argv[]){
 
     vector<int> pos_final_archivos; // Vector para almacenar las posiciones del final de los archivos leídos
     if (flag == "-f") {
-        texto = readFolder(nombre_archivo_carpeta, &pos_final_archivos, numArchivos);
+        texto = readFolder(nombre_archivo_carpeta, &pos_final_archivos, reporte ,numArchivos);
     } else if (flag == "-a") {
         texto = readFile(nombre_archivo_carpeta);
     } else {
@@ -89,7 +89,8 @@ int main(int argc, char *argv[]){
             tiempoTotal += getAndStopTime();
     }
     // Ordenar los datos según el algoritmo especificado
-    cout << "\nTiempo de ejecución: " << tiempoTotal << endl;
+    if(reporte) cout << "\nTiempo de ejecución: " ;
+    cout << tiempoTotal << endl;
 
     // Mostrar las posiciones encontradas por archivo
     if(reporte){

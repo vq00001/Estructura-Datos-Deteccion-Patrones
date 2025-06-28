@@ -19,7 +19,7 @@ static chrono::high_resolution_clock::time_point startTime;
 
 // Función para leer archivos de una carpeta y devolver su contenido como una cadena separada por "$"
 // Si cantidadArchivos es -1, se leen todos los archivos de la carpeta
-string readFolder(const string &carpeta, vector<int> *posiciones, int cantidadArchivos) {
+string readFolder(const string &carpeta, vector<int> *posiciones,bool expresivo ,int cantidadArchivos) {
     
     string txt = ""; // Variable para almacenar el contenido del archivo
 
@@ -29,7 +29,7 @@ string readFolder(const string &carpeta, vector<int> *posiciones, int cantidadAr
         
         if (!fs::is_regular_file(entry.path())) continue; // Solo archivos
         
-        cout << "Leyendo archivo: " << entry.path().filename() << endl; // Mostrar el nombre del archivo que se está leyendo
+        if(expresivo) cout << "Leyendo archivo: " << entry.path().filename() << endl; // Mostrar el nombre del archivo que se está leyendo
 
         if (!fs::exists(entry.path())) {
             cerr << "El archivo no existe: " << entry.path() << endl;
@@ -56,11 +56,11 @@ string readFolder(const string &carpeta, vector<int> *posiciones, int cantidadAr
     return txt; // Devolver el contenido del archivo como una cadena
 }
 
-string readFile(const string &archivo) {
+string readFile(const string &archivo,bool expresivo) {
     
     if (!fs::is_regular_file(archivo)) return ""; // Solo archivos
     
-    cout << "Leyendo archivo: " << archivo << endl; // Mostrar el nombre del archivo que se está leyendo
+    if(expresivo) cout << "Leyendo archivo: " << archivo << endl; // Mostrar el nombre del archivo que se está leyendo
     
     if (!fs::exists(archivo)) {
         cerr << "El archivo no existe: " << archivo << endl;
@@ -161,7 +161,7 @@ long long getAndStopTime(){
 }
 
 vector<string> readPatterns(const string &file){
-    string txt = readFile(file); //lee el archivo y lo guarad
+    string txt = readFile(file,false); //lee el archivo y lo guarad
 
 
     std::vector<string> patterns;

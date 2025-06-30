@@ -1,0 +1,9 @@
+# Archivos creados por Make
+*.o
+detectar_patrones.exe
+
+# Archivos de salida de compilación
+*.out
+
+# Archivos de Visual Studio Code
+.vscode/

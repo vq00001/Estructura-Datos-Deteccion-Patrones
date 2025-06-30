@@ -85,49 +85,36 @@ string readFile(const string &archivo) {
 }
 
 void encuentros_por_archivo(const string &carpeta, const vector<int> &posiciones_patrones, const vector<int> &pos_final_archivos) {
-
-    // Verificar si la carpeta existe
-    if (!fs::exists(carpeta)) {
-        cerr << "La carpeta no existe: " << carpeta << endl;
+    if (!fs::exists(carpeta) || !fs::is_directory(carpeta)) {
+        cerr << "Carpeta inválida: " << carpeta << endl;
         return;
     }
 
-    if (!fs::is_directory(carpeta)) {
-        cerr << "La ruta especificada no es una carpeta: " << carpeta << endl;
-        return;
-    }
-
-    // Almacenar los nombres de los archivos 
+    // Almacenar los nombres de los archivos en orden lexicográfico
     vector<pair<string, int>> nombres_archivos_vec;
- 
     for (const auto &entry : fs::directory_iterator(carpeta)) {
         if (fs::is_regular_file(entry.path())) {
-            nombres_archivos_vec.push_back({entry.path().filename().string(), 0});
+            nombres_archivos_vec.emplace_back(entry.path().filename().string(), 0);
         }
     }
 
-    
+    // Ordenar por nombre para asegurar orden consistente
+    sort(nombres_archivos_vec.begin(), nombres_archivos_vec.end());
+
+    // Ordenar las posiciones para hacer conteo eficiente
+    vector<int> posiciones_ordenadas = posiciones_patrones;
+    sort(posiciones_ordenadas.begin(), posiciones_ordenadas.end());
+
     size_t j = 0;
     for (size_t i = 0; i < nombres_archivos_vec.size(); ++i) {
-        
-        if (j >= posiciones_patrones.size()) break;
-
-        // Si el archivo actual no tiene ocurrencias del patrón, continuar al siguiente
-        if(pos_final_archivos[i] < posiciones_patrones[j]) {
-            continue;
-        }
-
-        // Contar las ocurrencias del patrón en el archivo actual
-        while (j < posiciones_patrones.size() && posiciones_patrones[j] <= pos_final_archivos[i]) {
+        while (j < posiciones_ordenadas.size() && posiciones_ordenadas[j] <= pos_final_archivos[i]) {
             nombres_archivos_vec[i].second++;
             j++;
         }
     }
-    
+
     cout << "\nArchivo, Ocurrencias" << endl;
-    // Imprimir los resultados
-    for (auto n : nombres_archivos_vec){
-        // if (n.second == 0) continue;
+    for (const auto &n : nombres_archivos_vec) {
         cout << n.first << ",  " << n.second << endl;
     }
 }

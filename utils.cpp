@@ -5,6 +5,7 @@
 #include <chrono>
 #include "utils.hpp"
 #include <filesystem>
+#include <string>
 namespace fs = std::filesystem;
 // #include "animation.hpp"
 
@@ -18,7 +19,7 @@ static chrono::high_resolution_clock::time_point startTime;
 
 // Función para leer archivos de una carpeta y devolver su contenido como una cadena separada por "$"
 // Si cantidadArchivos es -1, se leen todos los archivos de la carpeta
-string readFolder(const string &carpeta, vector<int> *posiciones, int cantidadArchivos) {
+string readFolder(const string &carpeta, vector<int> *posiciones,bool expresivo ,int cantidadArchivos) {
     
     string txt = ""; // Variable para almacenar el contenido del archivo
 
@@ -28,7 +29,7 @@ string readFolder(const string &carpeta, vector<int> *posiciones, int cantidadAr
         
         if (!fs::is_regular_file(entry.path())) continue; // Solo archivos
         
-        cout << "Leyendo archivo: " << entry.path().filename() << endl; // Mostrar el nombre del archivo que se está leyendo
+        if(expresivo) cout << "Leyendo archivo: " << entry.path().filename() << endl; // Mostrar el nombre del archivo que se está leyendo
 
         if (!fs::exists(entry.path())) {
             cerr << "El archivo no existe: " << entry.path() << endl;
@@ -55,11 +56,11 @@ string readFolder(const string &carpeta, vector<int> *posiciones, int cantidadAr
     return txt; // Devolver el contenido del archivo como una cadena
 }
 
-string readFile(const string &archivo) {
+string readFile(const string &archivo,bool expresivo) {
     
     if (!fs::is_regular_file(archivo)) return ""; // Solo archivos
     
-    cout << "Leyendo archivo: " << archivo << endl; // Mostrar el nombre del archivo que se está leyendo
+    if(expresivo) cout << "Leyendo archivo: " << archivo << endl; // Mostrar el nombre del archivo que se está leyendo
     
     if (!fs::exists(archivo)) {
         cerr << "El archivo no existe: " << archivo << endl;
@@ -146,4 +147,35 @@ void stopTimer() {
 
     cout << duration.count() << endl; // Imprimir solo el tiempo en nanosegundos para la exportación a CSV
     startTime = endTime; // Reiniciar el temporizador para la próxima vez
+}
+
+long long getAndStopTime(){
+    auto endTime = chrono::high_resolution_clock::now();
+    auto duration = chrono::duration_cast<chrono::nanoseconds>(endTime - startTime);
+
+    if (duration.count() == 0) cerr << "ADVERTENCIA: El tiempo medido es igual a 0 ns." << endl;
+
+    long long time = duration.count() ; 
+    startTime = endTime; // Reiniciar el temporizador para la próxima vez
+    return time;
+}
+
+vector<string> readPatterns(const string &file){
+    string txt = readFile(file,false); //lee el archivo y lo guarad
+
+
+    std::vector<string> patterns;
+    string separador = string("\n") + static_cast<char>(28) + "\n";
+    size_t inicio = 0;
+    size_t fin = txt.find(separador,inicio);
+
+    //Itera en el texto del archivo hasta encontrar el separador establecido, y guarda el string asociado en el vector  de patrones
+    while(fin != string::npos){
+        string patron = txt.substr(inicio, fin-inicio);
+        patterns.push_back(patron);
+        inicio = fin + separador.length(); 
+        fin = txt.find(separador,inicio);
+    }
+
+    return patterns;
 }

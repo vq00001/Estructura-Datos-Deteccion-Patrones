@@ -10,7 +10,7 @@ using namespace std;
 int main(int argc, char *argv[]){
 
     if (argc < 5) {
-        cerr << "Uso: " << argv[0] << " <algoritmo> <Patron> -<flag> <CarpetaConArchivosEntrada> <CantidadArchivos>" << endl;
+        cerr << "Uso: " << argv[0] << " <algoritmo> <Patron> -<flag> <CarpetaConArchivosEntrada> <FlagsAdicionales>" << endl;
         return 1;
     }
 
@@ -18,23 +18,44 @@ int main(int argc, char *argv[]){
     // si el flag es -f, se busca en carpetas
     // si el flag es -a, se busca en archivos 
     string algoritmo = argv[1];
-    string patron = argv[2];
+    vector<string> patrones = {argv[2]};
     string flag = argv[3];
+
     if (flag != "-f" && flag != "-a") {
         cerr << "Flag no reconocido. Ingresar -f para buscar en carpetas o -a para buscar en archivos." << endl;
         return 1;
     }
     string nombre_archivo_carpeta = argv[4];
+    string arg;
+    [[maybe_unused]] bool reporte = false, detallado = false, promedio = true ;
+    [[maybe_unused]] int repeticiones = 1, tiempo=0, numArchivos = -1;
+    long long tiempoTotal=0;
+
+    //Flags adicionales que puede colocar el usuario
+    for (int i = 5; i < argc; ++i){
+        arg = argv[i];
+        if(arg == "-r"){
+            reporte = true;
+        } else if(arg.find("-repeticiones=")==0){
+            repeticiones = stoi(arg.substr(14));
+        } else if(arg == "-d"){
+            detallado = true;
+        } else if(arg == "-p"){
+            promedio = false;
+        } else if(arg.find("-cantidad=")==0){
+            numArchivos = stoi(arg.substr(10));
+        } else if(arg == "--patrones"){
+            patrones = readPatterns(patrones[0]); //Interpreta el argumento del patron como el nombre de un archivo en vez de un patrón
+        }
+    }
     string texto;
     
     // Leer el archivo de entrada
     // Si se especifica una cantidad de archivos, se lee esa cantidad
 
     vector<int> pos_final_archivos; // Vector para almacenar las posiciones del final de los archivos leídos
-    if (argc > 5 && flag == "-f") {
-        texto = readFolder(nombre_archivo_carpeta, &pos_final_archivos, stoi(argv[5]));
-    } else if (flag == "-f") {
-        texto = readFolder(nombre_archivo_carpeta, &pos_final_archivos);
+    if (flag == "-f") {
+        texto = readFolder(nombre_archivo_carpeta, &pos_final_archivos, reporte ,numArchivos);
     } else if (flag == "-a") {
         texto = readFile(nombre_archivo_carpeta);
     } else {
@@ -43,39 +64,43 @@ int main(int argc, char *argv[]){
     }
 
     vector<int> posiciones;
-    // Ordenar los datos según el algoritmo especificado
-    if (algoritmo == "Boyer-Moore") {
-        startTimer();
+    vector<int> v;
+    for (string patron : patrones){
+        if (algoritmo == "Boyer-Moore") {
+                startTimer();
 
-        posiciones = boyer_moore(texto, patron);
+                posiciones = boyer_moore(texto, patron);
 
-    } else if (algoritmo == "KMP") {
-        startTimer();
+            } else if (algoritmo == "KMP") {
+                startTimer();
 
-        posiciones = KMP(patron,texto);
-        // Implementar KMP aquí
-    } else if (algoritmo == "Robin-Karp") {
-        startTimer();
+                posiciones = KMP(patron,texto);
 
-        posiciones = robinKarp(texto, patron);
-    
-    } else {
-        cerr << "Algoritmo no reconocido. Ingresar alguno de los siguientes: Boyer-Moore, KMP, Robin-Karp" << endl;
-        return 1;
+            } else if (algoritmo == "Robin-Karp") {
+                startTimer();
+
+                posiciones = robinKarp(texto, patron);
+            
+            } else {
+                cerr << "Algoritmo no reconocido. Ingresar alguno de los siguientes: Boyer-Moore, KMP, Robin-Karp" << endl;
+                return 1;
+            }
+
+            tiempoTotal += getAndStopTime();
     }
-
-    cout << "\nTiempo de ejecución: ";
-    stopTimer();
+    // Ordenar los datos según el algoritmo especificado
+    if(reporte) cout << "\nTiempo de ejecución: " ;
+    cout << tiempoTotal << endl;
 
     // Mostrar las posiciones encontradas por archivo
-
-    if (flag == "-f") {
-        cout << "Archivo: " << nombre_archivo_carpeta << endl;
-        encuentros_por_archivo(nombre_archivo_carpeta, posiciones, pos_final_archivos);
-    } else {
-        cout << "Cantidad de coincidencias encontradas: " << posiciones.size() << endl;
-    }
-
+    if(reporte){
+        if (flag == "-f") {
+            cout << "Archivo: " << nombre_archivo_carpeta << endl;
+            encuentros_por_archivo(nombre_archivo_carpeta, posiciones, pos_final_archivos);
+        } else {
+            cout << "Cantidad de coincidencias encontradas: " << posiciones.size() << endl;
+        } 
+    }   
 
     return 0;
 }

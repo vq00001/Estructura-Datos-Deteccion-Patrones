@@ -2,7 +2,9 @@
 #include <string>
 #include <algorithm>
 #include <numeric>
+#include <stdexcept>
 #include "FM-Index.hpp"
+#include "../utils/sais/sais.h"
 
 using namespace std;
 
@@ -25,18 +27,11 @@ void FMIndex::buildBWT(const string& input) {
     
     vector<int> local_suffix_array(n);
     iota(local_suffix_array.begin(), local_suffix_array.end(), 0);
-    
-    // Comparación optimizada que evita crear subcadenas
-    sort(local_suffix_array.begin(), local_suffix_array.end(), [&](int a, int b) {
-        int i = a, j = b;
-        while (i < n && j < n && text[i] == text[j]) {
-            i++;
-            j++;
-        }
-        if (i == n) return true;  // Sufijo a es prefijo de sufijo b
-        if (j == n) return false; // Sufijo b es prefijo de sufijo a
-        return text[i] < text[j];
-    });
+
+    // Construir el suffix array utilizando SAIS
+    if (sais(reinterpret_cast<const unsigned char*>(text.c_str()), local_suffix_array.data(), n) != 0) {
+        throw runtime_error("Error al construir el suffix array");
+    }
     
     // Guardar el suffix array como atributo de la clase
     this->suffix_array = local_suffix_array;

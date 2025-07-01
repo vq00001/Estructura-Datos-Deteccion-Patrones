@@ -2,7 +2,7 @@
 #include "algoritmos/boyer_moore.hpp"
 #include "algoritmos/KMP.hpp"
 #include "algoritmos/robin_karp.hpp"
-#include "estructuras/FM-Index.cpp"
+#include "estructuras/FM-Index.hpp"
 #include "utils/utils.hpp"
 #include <filesystem>
 #include <iterator>

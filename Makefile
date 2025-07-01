@@ -12,8 +12,8 @@ LDFLAGS = -lstdc++fs
 TARGET = detectar_patrones.exe
 
 # --- Búsqueda de archivos ---
-# Encuentra automáticamente todos los archivos .cpp en el directorio actual y en las carpetas 'algoritmos' y 'estructuras'
-SOURCES = $(wildcard *.cpp algoritmos/*.cpp estructuras/*.cpp utils/*.cpp utils/sais/*.c)
+# Encuentra automáticamente todos los archivos .cpp en el directorio actual y en las carpetas 'utils', 'algoritmos' y 'estructuras'
+SOURCES = $(wildcard *.cpp algoritmos/*.cpp estructuras/*.cpp utils/*.cpp utils/sais/*.cpp)
 
 # Genera los nombres de los archivos objeto (.o) a partir de los archivos fuente (.cpp)
 OBJECTS = $(SOURCES:.cpp=.o)

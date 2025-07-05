@@ -13,7 +13,7 @@ TARGET = detectar_patrones.exe
 
 # --- Búsqueda de archivos ---
 # Encuentra automáticamente todos los archivos .cpp en el directorio actual y en la carpeta 'algoritmos'
-SOURCES = $(wildcard *.cpp algoritmos/*.cpp)
+SOURCES = $(wildcard *.cpp algoritmos/*.cpp estructuras/*.cpp)
 
 # Genera los nombres de los archivos objeto (.o) a partir de los archivos fuente (.cpp)
 OBJECTS = $(SOURCES:.cpp=.o)

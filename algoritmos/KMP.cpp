@@ -1,5 +1,7 @@
 #include <string>
 #include <vector>
+#include <iostream>
+#include "KMP.hpp"
 
 using namespace std;
 
@@ -8,15 +10,14 @@ vector<int> tableKMP(const string& pattern){
 	int large = pattern.size();
 	int index = 0;
 	vector<int> tablaKMP(large,0);
-	tablaKMP[0] = -1;
 	for (int i = 1; i < large; ++i){
-		tablaKMP[i] = index;
+		while(index > 0 && pattern[index] != pattern[i]){
+			index = tablaKMP[index-1];
+		}
 		if(pattern[i] == pattern[index]){
 			index++;
 		}
-		else{
-			index = 0;
-		}
+		tablaKMP[i] = index;
 	}
 	return tablaKMP;
 }
@@ -36,18 +37,22 @@ vector<int> KMP(const string& pattern,const string& text){
 			//Si hay coincidencia ir moviendo los indices
 			if(pattern[indexPattern] == text[indexPattern+indexText]){
 				indexPattern++;
+				if(indexPattern == n){
+					positionArray.push_back(indexText);
+					indexText = indexText + indexPattern - f[indexPattern-1];
+					indexPattern = f[indexPattern-1]; 
+				}
 			}
 			//Si no, reiniciar indice y saltar posiciones segun la tabla de fallos.
 			else{
-				indexText = indexText + indexPattern - f[indexPattern];
-				if(indexPattern>0 ) indexPattern = f[indexPattern]; 
+				if(indexPattern == 0) indexText++;
+				else{
+					indexText = indexText + indexPattern - f[indexPattern-1];
+					indexPattern = f[indexPattern-1];
+				}
 			}
 			//Cuando hay coincidencia guardar la posición
-			if(indexPattern == n){
-				positionArray.push_back(indexText);
-				indexPattern = 0;
-				indexText++;
-			}
+			
 		}
 	}
 	return positionArray;

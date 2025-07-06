@@ -179,3 +179,18 @@ vector<string> readPatterns(const string &file){
 
     return patterns;
 }
+
+bool verifyPattern(vector<int> posiciones, const string &text, const string &pattern){
+    int n = pattern.size();
+    int m = text.size();
+    for (int i : posiciones){
+        for (int j = 0; j < n; ++j){
+            if(j+i >= m || text[j+i] != pattern[j]){
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+

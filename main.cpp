@@ -2,6 +2,8 @@
 #include "algoritmos/boyer_moore.hpp"
 #include "algoritmos/KMP.hpp"
 #include "algoritmos/robin_karp.hpp"
+#include "algoritmos/KMP_bad.hpp"
+#include "estructuras/suffix_tree.hpp"
 #include "utils.hpp"
 #include <filesystem>
 #include <iterator>
@@ -27,7 +29,7 @@ int main(int argc, char *argv[]){
     }
     string nombre_archivo_carpeta = argv[4];
     string arg;
-    [[maybe_unused]] bool reporte = false, detallado = false, promedio = true ;
+    [[maybe_unused]] bool reporte = false, detallado = false, promedio = true, test = false ;
     [[maybe_unused]] int repeticiones = 1, tiempo=0, numArchivos = -1;
     long long tiempoTotal=0;
 
@@ -46,6 +48,8 @@ int main(int argc, char *argv[]){
             numArchivos = stoi(arg.substr(10));
         } else if(arg == "--patrones"){
             patrones = readPatterns(patrones[0]); //Interpreta el argumento del patron como el nombre de un archivo en vez de un patrón
+        } else if(arg == "-test"){
+            test = true;
         }
     }
     string texto;
@@ -65,6 +69,14 @@ int main(int argc, char *argv[]){
 
     vector<int> posiciones;
     vector<int> v;
+    SuffixTree* tree;
+    if(algoritmo == "Suffix-Tree"){
+        startTimer();
+        tree = new SuffixTree(texto);
+        //tiempoTotal+= getAndStopTime();
+        stopTimer();
+  } 
+
     for (string patron : patrones){
         if (algoritmo == "Boyer-Moore") {
                 startTimer();
@@ -81,17 +93,32 @@ int main(int argc, char *argv[]){
 
                 posiciones = robinKarp(texto, patron);
             
+            } else if(algoritmo == "KMP_bad"){
+                startTimer();
+
+                posiciones = KMP_bad(patron,texto);
+            } else if(algoritmo == "Suffix-Tree"){
+                startTimer();
+
+                posiciones = tree->search(patron);
             } else {
                 cerr << "Algoritmo no reconocido. Ingresar alguno de los siguientes: Boyer-Moore, KMP, Robin-Karp" << endl;
                 return 1;
             }
-
-            tiempoTotal += getAndStopTime();
+            //tiempoTotal += getAndStopTime();
+            stopTimer();
+            if(test){
+                if(verifyPattern(posiciones,texto,patron)) cout << "El algoritmo funciona" << endl;
+                else cout << "Aparentemente no..." << endl;
+            }
     }
+
+    if(algoritmo == "Suffix-Tree") delete tree;
     // Ordenar los datos según el algoritmo especificado
     if(reporte) cout << "\nTiempo de ejecución: " ;
     cout << tiempoTotal << endl;
 
+    
     // Mostrar las posiciones encontradas por archivo
     if(reporte){
         if (flag == "-f") {

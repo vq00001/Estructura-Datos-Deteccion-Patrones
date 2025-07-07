@@ -4,7 +4,8 @@
 #include "algoritmos/robin_karp.hpp"
 #include "algoritmos/KMP_bad.hpp"
 #include "estructuras/suffix_tree.hpp"
-#include "utils.hpp"
+#include "estructuras/FM-Index.hpp"
+#include "utils/utils.hpp"
 #include <filesystem>
 #include <iterator>
 using namespace std;
@@ -70,12 +71,17 @@ int main(int argc, char *argv[]){
     vector<int> posiciones;
     vector<int> v;
     SuffixTree* tree;
+    FMIndex* fmIndex = nullptr;
     if(algoritmo == "Suffix-Tree"){
         startTimer();
         tree = new SuffixTree(texto);
         //tiempoTotal+= getAndStopTime();
         stopTimer();
-  } 
+    } else if (algoritmo == "FM-Index"){
+        startTimer();
+        fmIndex = new FMIndex(texto);
+        stopTimer();
+    } 
 
     for (string patron : patrones){
         if (algoritmo == "Boyer-Moore") {
@@ -101,6 +107,10 @@ int main(int argc, char *argv[]){
                 startTimer();
 
                 posiciones = tree->search(patron);
+            } else if (algoritmo == "FM-Index") {
+                startTimer();
+
+                posiciones = fmIndex->search(patron);            
             } else {
                 cerr << "Algoritmo no reconocido. Ingresar alguno de los siguientes: Boyer-Moore, KMP, Robin-Karp" << endl;
                 return 1;
@@ -114,9 +124,10 @@ int main(int argc, char *argv[]){
     }
 
     if(algoritmo == "Suffix-Tree") delete tree;
+    if(algoritmo == "FM-Index") delete fmIndex;
     // Ordenar los datos según el algoritmo especificado
-    if(reporte) cout << "\nTiempo de ejecución: " ;
-    cout << tiempoTotal << endl;
+    //if(reporte) cout << "\nTiempo de ejecución: " ;
+    //cout << tiempoTotal << endl;
 
     
     // Mostrar las posiciones encontradas por archivo

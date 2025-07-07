@@ -5,9 +5,9 @@
 #include <chrono>
 #include "utils.hpp"
 #include <filesystem>
+#include "animation.hpp"
 #include <string>
 namespace fs = std::filesystem;
-// #include "animation.hpp"
 
 #define BUFFER_SIZE 1024 // Tamaño del buffer para lectura de archivos
 
@@ -21,6 +21,11 @@ static chrono::high_resolution_clock::time_point startTime;
 // Si cantidadArchivos es -1, se leen todos los archivos de la carpeta
 string readFolder(const string &carpeta, vector<int> *posiciones,bool expresivo ,int cantidadArchivos) {
     
+    SimpleAnimator animador;
+    if(expresivo){
+        animador.start("\033[34mLeyendo archivos");
+    }
+
     string txt = ""; // Variable para almacenar el contenido del archivo
 
     for (const auto & entry : fs::directory_iterator(carpeta)){
@@ -29,17 +34,15 @@ string readFolder(const string &carpeta, vector<int> *posiciones,bool expresivo 
         
         if (!fs::is_regular_file(entry.path())) continue; // Solo archivos
         
-        if(expresivo) cout << "Leyendo archivo: " << entry.path().filename() << endl; // Mostrar el nombre del archivo que se está leyendo
-
         if (!fs::exists(entry.path())) {
-            cerr << "El archivo no existe: " << entry.path() << endl;
+            animador.end("\033[31mEl archivo no existe: \033[0m" + entry.path().string());
             return "";
         }
         
         ifstream file(entry.path());
         
         if (!file.is_open()) {
-            cerr << "Error al abrir el archivo: " << entry.path() << endl;
+            animador.end("\033[31mError al abrir archivo: \033[0m" + entry.path().string());
             return "";
         }
 
@@ -52,6 +55,10 @@ string readFolder(const string &carpeta, vector<int> *posiciones,bool expresivo 
         
 
         cantidadArchivos--; // Decrementar la cantidad de archivos restantes   
+    }
+
+    if (expresivo) {
+        animador.end("\033[32mArchivos leídos con éxito.\033[0m"); // Terminar la animación
     }
     return txt; // Devolver el contenido del archivo como una cadena
 }
@@ -82,45 +89,34 @@ string readFile(const string &archivo,bool expresivo) {
 }
 
 void encuentros_por_archivo(const string &carpeta, const vector<int> &posiciones_patrones, const vector<int> &pos_final_archivos) {
-
-    // Verificar si la carpeta existe
-    if (!fs::exists(carpeta)) {
-        cerr << "La carpeta no existe: " << carpeta << endl;
+    if (!fs::exists(carpeta) || !fs::is_directory(carpeta)) {
+        cerr << "Carpeta inválida: " << carpeta << endl;
         return;
     }
 
-    if (!fs::is_directory(carpeta)) {
-        cerr << "La ruta especificada no es una carpeta: " << carpeta << endl;
-        return;
-    }
-
-    // Almacenar los nombres de los archivos 
+    // Almacenar los nombres de los archivos en orden lexicográfico
     vector<pair<string, int>> nombres_archivos_vec;
- 
     for (const auto &entry : fs::directory_iterator(carpeta)) {
         if (fs::is_regular_file(entry.path())) {
-            nombres_archivos_vec.push_back({entry.path().filename().string(), 0});
+            nombres_archivos_vec.emplace_back(entry.path().filename().string(), 0);
         }
     }
 
-    
+    // Ordenar por nombre para asegurar orden consistente
+    sort(nombres_archivos_vec.begin(), nombres_archivos_vec.end());
+
+    // Ordenar las posiciones para hacer conteo eficiente
+    vector<int> posiciones_ordenadas = posiciones_patrones;
+    sort(posiciones_ordenadas.begin(), posiciones_ordenadas.end());
+
     size_t j = 0;
     for (size_t i = 0; i < nombres_archivos_vec.size(); ++i) {
-        
-        if (j >= posiciones_patrones.size()) break;
-
-        // Si el archivo actual no tiene ocurrencias del patrón, continuar al siguiente
-        if(pos_final_archivos[i] < posiciones_patrones[j]) {
-            continue;
-        }
-
-        // Contar las ocurrencias del patrón en el archivo actual
-        while (j < posiciones_patrones.size() && posiciones_patrones[j] <= pos_final_archivos[i]) {
+        while (j < posiciones_ordenadas.size() && posiciones_ordenadas[j] <= pos_final_archivos[i]) {
             nombres_archivos_vec[i].second++;
             j++;
         }
     }
-    
+
     cout << "\nArchivo, Ocurrencias" << endl;
     // Imprimir los resultados
     for (auto n : nombres_archivos_vec){
@@ -140,8 +136,6 @@ void startTimer() {
 void stopTimer() {
     auto endTime = chrono::high_resolution_clock::now();
     auto duration = chrono::duration_cast<chrono::nanoseconds>(endTime - startTime);
-    //auto durationSeconds = chrono::duration_cast<chrono::seconds>(endTime - startTime);
-    //cout << "Tiempo transcurrido: " << duration.count() << " nanosegundos (" << durationSeconds.count() << " segundos)." << endl;
 
     if (duration.count() == 0) cerr << "ADVERTENCIA: El tiempo medido es igual a 0 ns." << endl;
 

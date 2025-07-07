@@ -51,6 +51,8 @@ int main(int argc, char *argv[]){
             patrones = readPatterns(patrones[0]); //Interpreta el argumento del patron como el nombre de un archivo en vez de un patrón
         } else if(arg == "-test"){
             test = true;
+        } else{
+            cout << "Flag no reconocida" << endl;
         }
     }
     string texto;

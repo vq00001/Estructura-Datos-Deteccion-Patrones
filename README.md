@@ -15,7 +15,12 @@ Proyecto semestral para el ramo Estructuras de Datos.
 ---
 
 ## Usar programa:
-`./detectar_patrones.exe <algoritmo> <Patron> -<flag> <NombreArchivoOCarpeta> <CantidadArchivos>`
+`./detectar_patrones.exe <algoritmo> <Patron> -<flag> <NombreArchivoOCarpeta> <FlagsAdicionales>`
 
 Para analizar todos los archivos de una carpeta usar la flag `-f` y para archivos individuales usar `-a`.
 Por default se procesan todos los archivos dentro de la carpeta a menos que se especifique una cantidad.
+
+Flags adicionales:
+`-r` : Si se usa el programa tambien imprimirá la cantidad de encuentros por archivo (En caso de usar multiples patrones solo imprimirá los del ultimo patron por ahora).
+`-cantidad=<numero>` : Para especificar una cantidad limitada de archivos que queremos concatenar de la carpeta especificada.
+`--patrones` : Para especificar que el patron puesto es el nombre de un archivo con patrones en vez de un patrón en sí.

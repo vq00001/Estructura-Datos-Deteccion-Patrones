@@ -6,6 +6,7 @@
 #include "utils.hpp"
 #include <filesystem>
 #include "animation.hpp"
+#include <string>
 namespace fs = std::filesystem;
 
 #define BUFFER_SIZE 1024 // Tamaño del buffer para lectura de archivos
@@ -18,10 +19,12 @@ static chrono::high_resolution_clock::time_point startTime;
 
 // Función para leer archivos de una carpeta y devolver su contenido como una cadena separada por "$"
 // Si cantidadArchivos es -1, se leen todos los archivos de la carpeta
-string readFolder(const string &carpeta, vector<int> *posiciones, int cantidadArchivos) {
+string readFolder(const string &carpeta, vector<int> *posiciones,bool expresivo ,int cantidadArchivos) {
     
     SimpleAnimator animador;
-    animador.start("\033[34mLeyendo archivos");
+    if(expresivo){
+        animador.start("\033[34mLeyendo archivos");
+    }
 
     string txt = ""; // Variable para almacenar el contenido del archivo
 
@@ -54,16 +57,17 @@ string readFolder(const string &carpeta, vector<int> *posiciones, int cantidadAr
         cantidadArchivos--; // Decrementar la cantidad de archivos restantes   
     }
 
-    animador.end("\033[32mArchivos leídos con éxito.\033[0m"); // Terminar la animación
-
+    if (expresivo) {
+        animador.end("\033[32mArchivos leídos con éxito.\033[0m"); // Terminar la animación
+    }
     return txt; // Devolver el contenido del archivo como una cadena
 }
 
-string readFile(const string &archivo) {
+string readFile(const string &archivo,bool expresivo) {
     
     if (!fs::is_regular_file(archivo)) return ""; // Solo archivos
     
-    cout << "Leyendo archivo: " << archivo << endl; // Mostrar el nombre del archivo que se está leyendo
+    if(expresivo) cout << "Leyendo archivo: " << archivo << endl; // Mostrar el nombre del archivo que se está leyendo
     
     if (!fs::exists(archivo)) {
         cerr << "El archivo no existe: " << archivo << endl;
@@ -114,7 +118,9 @@ void encuentros_por_archivo(const string &carpeta, const vector<int> &posiciones
     }
 
     cout << "\nArchivo, Ocurrencias" << endl;
-    for (const auto &n : nombres_archivos_vec) {
+    // Imprimir los resultados
+    for (auto n : nombres_archivos_vec){
+        if (n.second == 0) continue;
         cout << n.first << ",  " << n.second << endl;
     }
 }
@@ -136,3 +142,49 @@ void stopTimer() {
     cout << duration.count() << endl; // Imprimir solo el tiempo en nanosegundos para la exportación a CSV
     startTime = endTime; // Reiniciar el temporizador para la próxima vez
 }
+
+long long getAndStopTime(){
+    auto endTime = chrono::high_resolution_clock::now();
+    auto duration = chrono::duration_cast<chrono::nanoseconds>(endTime - startTime);
+
+    if (duration.count() == 0) cerr << "ADVERTENCIA: El tiempo medido es igual a 0 ns." << endl;
+
+    long long time = duration.count() ; 
+    startTime = endTime; // Reiniciar el temporizador para la próxima vez
+    return time;
+}
+
+vector<string> readPatterns(const string &file){
+    string txt = readFile(file,false); //lee el archivo y lo guarad
+
+
+    std::vector<string> patterns;
+    string separador = string("\n") + static_cast<char>(28) + "\n";
+    size_t inicio = 0;
+    size_t fin = txt.find(separador,inicio);
+
+    //Itera en el texto del archivo hasta encontrar el separador establecido, y guarda el string asociado en el vector  de patrones
+    while(fin != string::npos){
+        string patron = txt.substr(inicio, fin-inicio);
+        patterns.push_back(patron);
+        inicio = fin + separador.length(); 
+        fin = txt.find(separador,inicio);
+    }
+
+    return patterns;
+}
+
+bool verifyPattern(vector<int> posiciones, const string &text, const string &pattern){
+    int n = pattern.size();
+    int m = text.size();
+    for (int i : posiciones){
+        for (int j = 0; j < n; ++j){
+            if(j+i >= m || text[j+i] != pattern[j]){
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+

@@ -25,7 +25,7 @@ set "CANTIDAD_FIJA=20"
 :: ENCABEZADOS CSV
 :: -----------------------------
 echo Algoritmo;Archivos;Cantidad;Patrones;Tiempo_Promedio(ns);Varianza(ns)> "%CSV_ARCHIVOS%"
-echo Algoritmo;Archivos;Cantidad;Patrones;Tiempo_Promedio(ns);Varianza(ns) >> "%CSV_PATRONES%"
+echo Algoritmo;Archivos;Cantidad;Patrones;Tiempo_Promedio(ns);Varianza(ns)> "%CSV_PATRONES%"
 
 :: -----------------------------
 :: BLOQUE 2 - Archivos variables con patrón fijo

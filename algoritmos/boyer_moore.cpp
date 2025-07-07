@@ -8,10 +8,23 @@
 
 #include <bits/stdc++.h>
 #include "boyer_moore.hpp"
+#define NO_OF_CHARS 256 // Alfabeto ASCII
 
 using namespace std;
+// Funcion para calcular la heurística de Bad Character
+void badCharacterHeuristic(string str, int size, int badchar[NO_OF_CHARS]) {
+
+    // Inicializar todos los caracteres en -1
+    for (int i = 0; i < NO_OF_CHARS; i++)
+        badchar[i] = -1;
+
+    // Si el caracter esta en el patron, almacenar su ultima ocurrencia
+    for (int i = 0; i < size; i++)
+        badchar[(int)str[i]] = i;
+}
 
 // Funcion para calcular el desplazamiento completo del patrón
+// 
 void computeFullShift(int shiftArr[], int longSuffArr[], string patrn) {
 
     
@@ -70,6 +83,10 @@ void searchPattern(string orgnStr, string patrn, vector<int> *position_array) {
         shiftArr[i] = 0;
     }
 
+    // Llamando a la función de heurística del mal carácter para calcular los desplazamientos
+    int badChar[NO_OF_CHARS];
+    badCharacterHeuristic(patrn, patLen, badChar);
+
     /* Llamando a la función computeFullShift y computeGoodSuffix para calcular los desplazamientos
     * La primera calcula los desplazamientos completos para el patrón y la segunda calcula los  
     * desplazamientos de Good Suffix.
@@ -78,9 +95,10 @@ void searchPattern(string orgnStr, string patrn, vector<int> *position_array) {
     computeFullShift(shiftArr, longerSuffArray, patrn); 
     computeGoodSuffix(shiftArr, longerSuffArray, patrn); 
     
-    int shift = 0;
+    int shift = 0; // la cantidad desplazada del patrón en la cadena original
     while(shift <= (strLen - patLen)) {
         int j = patLen - 1;
+        
         // disminuir j cuando el patron y el caracter de la cadena principal coinciden
         while(j >= 0 && patrn[j] == orgnStr[shift+j]) {
             j--; 
@@ -89,12 +107,16 @@ void searchPattern(string orgnStr, string patrn, vector<int> *position_array) {
         // Si j es menor que 0, significa que se encontró el patrón
         if(j < 0) {
             // almacenar la posición donde se encuentra el patrón
-            // cout << shift << endl; // Imprimir la posición donde se encontró el patrón
             position_array->push_back(shift); 
             shift += max(shiftArr[0], 1);   // Desplazar el patrón 
         } else {
             // Si j es mayor o igual a 0, significa que no se encontró el patrón
-            shift += max(shiftArr[j+1], 1); // Desplazar el patrón
+
+            int shift_bad_char = j - badChar[(int)orgnStr[shift + j]]; // Calcular el desplazamiento por mal carácter
+
+
+            // Desplazar el patron segun el máximo entre el desplazamiento por mal carácter y el desplazamiento por buen sufijo
+            shift += max(max(shiftArr[j+1], shift_bad_char), 1); 
         }
     }
 }

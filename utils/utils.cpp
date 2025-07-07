@@ -48,7 +48,12 @@ string readFolder(const string &carpeta, vector<int> *posiciones,bool expresivo 
             return "";
         }
 
-        txt = txt + "$" + string((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
+        string file_content = string((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
+        // Reemplazar caracteres no ASCII
+        for (char &c : file_content) {
+            if (static_cast<unsigned char>(c) > 127) c = '\x1F';
+        }
+        txt = txt + "$" + file_content;
         file.close();
 
         
@@ -85,6 +90,10 @@ string readFile(const string &archivo,bool expresivo) {
     }
 
     string txt = string(istreambuf_iterator<char>(file), istreambuf_iterator<char>());
+    // Reemplazar caracteres no ASCII
+    for (char &c : txt) {
+        if (static_cast<unsigned char>(c) > 127) c = '\x1F';
+    }
     file.close();
     
     return txt; // Devolver el contenido del archivo como una cadena

@@ -67,7 +67,7 @@ int main(int argc, char *argv[]){
         cerr << "Error al leer el archivo o carpeta." << endl;
         return 1;
     }
-
+    long long tiempo_creacion = 0;
     vector<int> posiciones;
     vector<int> v;
     SuffixTree* tree;
@@ -76,15 +76,21 @@ int main(int argc, char *argv[]){
         startTimer();
         tree = new SuffixTree(texto);
         //tiempoTotal+= getAndStopTime();
-        stopTimer();
+        tiempo_creacion = getAndStopTime();
+        escribirCSVTiempoConstruccion(tiempo_creacion, algoritmo,nombre_archivo_carpeta, numArchivos, "tiempo_de_creacion.csv");
     } else if (algoritmo == "FM-Index"){
         startTimer();
         fmIndex = new FMIndex(texto);
-        stopTimer();
+        tiempo_creacion = getAndStopTime();
+        escribirCSVTiempoConstruccion(tiempo_creacion, algoritmo, nombre_archivo_carpeta, numArchivos, "tiempo_de_creacion.csv");
     } 
+    
 
-    for (string patron : patrones){
-        if (algoritmo == "Boyer-Moore") {
+    vector<long long>  tiemposAlgoritmo; // Vector para almacenar los tiempos de ejecución de cada algoritmo
+
+    for(int i = 0; i < repeticiones; i++) {
+        for (string patron : patrones){
+            if (algoritmo == "Boyer-Moore") {
                 startTimer();
 
                 posiciones = boyer_moore(texto, patron);
@@ -115,13 +121,21 @@ int main(int argc, char *argv[]){
                 cerr << "Algoritmo no reconocido. Ingresar alguno de los siguientes: Boyer-Moore, KMP, Robin-Karp" << endl;
                 return 1;
             }
-            //tiempoTotal += getAndStopTime();
-            stopTimer();
+            tiempoTotal += getAndStopTime();
+            
             if(test){
                 if(verifyPattern(posiciones,texto,patron)) cout << "El algoritmo funciona" << endl;
                 else cout << "Aparentemente no..." << endl;
             }
+        }
+
+        tiemposAlgoritmo.push_back(tiempoTotal);
+        tiempoTotal = 0;
     }
+
+
+    pair<long long, long long> promedioVarianza = calcularPromedioYVarianza(tiemposAlgoritmo);
+    cout << promedioVarianza.first << ";" << promedioVarianza.second << endl;   
 
     if(algoritmo == "Suffix-Tree") delete tree;
     if(algoritmo == "FM-Index") delete fmIndex;

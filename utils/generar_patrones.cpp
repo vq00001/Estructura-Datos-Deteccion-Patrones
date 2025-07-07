@@ -47,19 +47,15 @@ void enlistar_archivos(string dir_base, vector<string> *lista_archivos){
     }
 }
 
-void patron_existente(string nombre_archivo, int cant_patrones, string ruta){
+void patron_existente(string nombre_archivo, int cant_patrones, string ruta, 
+                      int largo_min = 1, int largo_max = 100){
 
-    long long largo_max = 0, largo_min = 0; // Largo maximo del patron
-    
-    cout << "Ingrese el largo minimo del patron: ";
-    cin >> largo_min;
+
     if (largo_min < 1) {
         cerr << "El largo minimo debe ser mayor a 0." << endl;
         exit(1);
     }
 
-    cout << "Ingrese el largo maximo del patron: ";
-    cin >> largo_max;
     if (largo_max <= largo_min) {
         cerr << "El largo maximo debe ser mayor a al largo minimo." << endl;
         exit(1);
@@ -90,7 +86,7 @@ void patron_existente(string nombre_archivo, int cant_patrones, string ruta){
 
         long long tamaño_file = file.tellg();                               
         int posicion = generar_numero_random(0, tamaño_file);
-        int largo_patron = generar_numero_random(largo_min, min(tamaño_file - posicion, largo_max));
+        int largo_patron = generar_numero_random(largo_min, min(static_cast<int>(tamaño_file - posicion), largo_max));
 
         // ir a posicion en archivo y leer la cantidad de caracteres de largo_patron
         file.seekg(posicion); 
@@ -110,18 +106,13 @@ void patron_existente(string nombre_archivo, int cant_patrones, string ruta){
     file_resultados.close();
 }
 
-void patron_random(string nombre_archivo, int cant_patrones){
-    int largo_max = 0, largo_min = 0; // Largo maximo del patron
-    
-    cout << "Ingrese el largo minimo del patron: ";
-    cin >> largo_min;
+void patron_random(string nombre_archivo, int cant_patrones, int largo_min = 1, int largo_max = 100){
+
     if (largo_min < 1) {
         cerr << "El largo minimo debe ser mayor a 0." << endl;
         exit(1);
     }
 
-    cout << "Ingrese el largo maximo del patron: ";
-    cin >> largo_max;
     if (largo_max <= largo_min) {
         cerr << "El largo maximo debe ser mayor a al largo minimo." << endl;
         exit(1);
@@ -152,7 +143,7 @@ int main(int argc, char* argv[]){
 
     if(argc < 3){
         // NombreArchivo es opcional
-        printf("Uso: %s <CantidadPatrones> <TipoPatrones> <NombreArchivo>", argv[0]);
+        printf("Uso: %s <CantidadPatrones> <TipoPatrones> <NombreArchivo> <LargoMinimo> <LargoMaximo>", argv[0]);
         return 1;
     }
 
@@ -163,13 +154,19 @@ int main(int argc, char* argv[]){
         nombre = argv[3];
     }
 
+    int largo_min = 1;
+    int largo_max = 100;
+    if(argc >= 5){
+        largo_min = stoi(argv[4]);
+    }
+    if(argc >= 6){
+        largo_max = stoi(argv[5]);
+    }
+
     if(tipo_patron == "Random"){
-        patron_random(nombre, cantidad_patrones);
+        patron_random(nombre, cantidad_patrones, largo_min, largo_max);
     } else if (tipo_patron == "Existente"){
-        string ruta;
-        cout << "Ingresar nombre de ruta de archivo existente: " ;
-        cin >> ruta;
-        patron_existente(nombre, cantidad_patrones,ruta);
+        patron_existente(nombre, cantidad_patrones, "../archivos_de_prueba/", largo_min, largo_max);
     } else if(tipo_patron == "Manual"){
         return 0;
     }

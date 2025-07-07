@@ -7,6 +7,8 @@
 #include <filesystem>
 #include "animation.hpp"
 #include <string>
+#include <algorithm>
+
 namespace fs = std::filesystem;
 
 #define BUFFER_SIZE 1024 // Tamaño del buffer para lectura de archivos
@@ -155,8 +157,7 @@ long long getAndStopTime(){
 }
 
 vector<string> readPatterns(const string &file){
-    string txt = readFile(file,false); //lee el archivo y lo guarad
-
+    string txt = readFile(file,false); //lee el archivo y lo guarda
 
     std::vector<string> patterns;
     string separador = string("\n") + static_cast<char>(28) + "\n";
@@ -187,4 +188,63 @@ bool verifyPattern(vector<int> posiciones, const string &text, const string &pat
     return true;
 }
 
+
+pair<long long, long long> calcularPromedioYVarianza(const vector<long long> &tiempos) {
+    if (tiempos.empty()) return {0, 0}; // Si no hay tiempos, retornar 0 para ambos
+
+    long long suma = 0;
+    for (long long tiempo : tiempos) {
+        suma += tiempo;
+    }
+
+    double promedio = static_cast<double>(suma) / tiempos.size();
+
+    double varianza = 0;
+    for (long long tiempo : tiempos) {
+        varianza += (tiempo - promedio) * (tiempo - promedio);
+    }
+    varianza /= tiempos.size();
+
+    return {static_cast<long long>(promedio), static_cast<long long>(varianza)};
+}
+
+void escribirCSVTiempoConstruccion(long long tiempo_creacion, const string &algoritmo, const string &carpeta, int cant_archivos, const string &archivo) {
+    ofstream file(archivo, ios::app);
+    if (!file.is_open()) {
+        cerr << "Error al abrir el archivo CSV: " << archivo << endl;
+        return;
+    }
+    file << carpeta << ";" <<  cant_archivos << ";" << algoritmo << ";" << tiempo_creacion << endl;
+    file.close();
+}
+
+
+// void eliminarCharNoAscii() {
+//     int cantidadArchivos = -1; // Inicializar la cantidad de archivos a 0
+//     string txt = "";
+//     for (const auto & entry : fs::directory_iterator('./archivos_de_prueba/sources/')){
+
+//         if (cantidadArchivos == 0) break; // Si se ha alcanzado la cantidad de archivos, salir del bucle
+        
+//         if (!fs::is_regular_file(entry.path())) continue; // Solo archivos
+        
+        
+//         ifstream file(entry.path());
+        
+//         if (!file.is_open()) {
+//             animador.end("\033[31mError al abrir archivo: \033[0m" + entry.path().string());
+//             return "";
+//         }
+
+//         txt = txt + "$" + string((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
+//         file.close();
+
+        
+//         // Si se pasan posiciones, agregar la posición del archivo al vector
+//         posiciones->push_back(txt.size() - 1); // Agregar la posición del final del archivo
+        
+
+//         cantidadArchivos--; // Decrementar la cantidad de archivos restantes   
+//     }
+// }
 

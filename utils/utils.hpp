@@ -17,6 +17,7 @@ void stopTimer();
 long long getAndStopTime();
 std::vector<string> readPatterns(const string &file);
 bool verifyPattern(vector<int> posiciones, const string &text, const string &pattern);
+pair<long long, long long> calcularPromedioYVarianza(const vector<long long> &tiempos);
 
-
+void escribirCSVTiempoConstruccion(long long tiempo_creacion, const string &algoritmo,const string &carpeta, int cant_archivos, const string &archivo="tiempo_de_creacion.csv");
 #endif

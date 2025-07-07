@@ -1,1 +1,2 @@
-Algoritmo;Archivos;Patrones;Tiempo_Promedio(ns);Varianza(ns)
+Algoritmo;Archivos;Cantidad;Patrones;Tiempo_Promedio(ns);Varianza(ns)
+FM-Index;Proteins;10;patrones1_100_Existente;4588000;0 

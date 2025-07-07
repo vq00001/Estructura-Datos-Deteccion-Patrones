@@ -148,8 +148,6 @@ void stopTimer() {
     auto endTime = chrono::high_resolution_clock::now();
     auto duration = chrono::duration_cast<chrono::nanoseconds>(endTime - startTime);
 
-    if (duration.count() == 0) cerr << "ADVERTENCIA: El tiempo medido es igual a 0 ns." << endl;
-
     cout << duration.count() << endl; // Imprimir solo el tiempo en nanosegundos para la exportación a CSV
     startTime = endTime; // Reiniciar el temporizador para la próxima vez
 }
@@ -157,8 +155,6 @@ void stopTimer() {
 long long getAndStopTime(){
     auto endTime = chrono::high_resolution_clock::now();
     auto duration = chrono::duration_cast<chrono::nanoseconds>(endTime - startTime);
-
-    if (duration.count() == 0) cerr << "ADVERTENCIA: El tiempo medido es igual a 0 ns." << endl;
 
     long long time = duration.count() ; 
     startTime = endTime; // Reiniciar el temporizador para la próxima vez
@@ -223,7 +219,8 @@ void escribirCSVTiempoConstruccion(long long tiempo_creacion, const string &algo
         cerr << "Error al abrir el archivo CSV: " << archivo << endl;
         return;
     }
-    file << carpeta << ";" <<  cant_archivos << ";" << algoritmo << ";" << tiempo_creacion << endl;
+    
+    file << algoritmo << ";" << carpeta << ";" <<  cant_archivos << ";" << tiempo_creacion << endl;
     file.close();
 }
 

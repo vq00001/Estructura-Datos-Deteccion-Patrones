@@ -1,1 +1,3 @@
-Carpeta;Cantidad de Archivos;Algoritmo;Tiempo de Creación (ns)
+"--------- Cantidad de Archivos variable -------------" 
+Algoritmo;Archivos;Cantidad;Tiempo_Promedio(ns) 
+FM-Index;archivos_de_prueba\Proteins;10;29692644000

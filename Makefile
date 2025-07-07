@@ -3,7 +3,7 @@
 CXX = g++
 
 # Flags del compilador: -std=c++17 para C++17, -Wall para mostrar todas las advertencias, -Wextra  para advertencias adicionales, -I. para incluir el directorio actual
-CXXFLAGS = -std=c++17 -Wall -Wextra -I.
+CXXFLAGS = -std=c++17 -Wall -Wextra -I. -O2
 
 # Flags del enlazador (linker): -lstdc++fs para la librería filesystem
 LDFLAGS = -lstdc++fs

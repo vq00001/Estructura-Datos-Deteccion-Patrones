@@ -25,7 +25,7 @@ private:
     int* leafEnd; //puntero al end de los hojas
 
     void doTransversal(SuffixTreeNode* node, std::vector<int>& posiciones);
-    void freeNodeIterative(SuffixTreeNode* root);
+    void freeNode(SuffixTreeNode* root);
     bool walkDown(SuffixTreeNode* node);
     //Atributos del punto activo
     SuffixTreeNode* activeNode; 

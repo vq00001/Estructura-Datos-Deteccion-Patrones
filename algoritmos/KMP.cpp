@@ -5,6 +5,10 @@
 
 using namespace std;
 
+//Implementación basada en el concepto obtenido de su definición en wikipedia y luego optimizada 
+//en base a otras implementaciones vistas
+//https://es.wikipedia.org/wiki/Algoritmo_Knuth-Morris-Pratt
+
 /* Funcion para crear la tabla de fallos de KMP */
 vector<int> tableKMP(const string& pattern){
 	int large = pattern.size();

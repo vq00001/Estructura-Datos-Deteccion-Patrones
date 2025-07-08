@@ -30,20 +30,20 @@ echo Algoritmo;Archivos;Cantidad;Patrones;Tiempo_Promedio(ns);Varianza(ns)> "%CS
 :: -----------------------------
 :: BLOQUE 2 - Archivos variables con patrón fijo
 :: -----------------------------
-echo --------- Cantidad de Archivos variable ------------- > "tiempo_de_creacion.csv"
-echo Algoritmo;Archivos;Cantidad;Tiempo_Promedio(ns) >> "tiempo_de_creacion.csv"
+@REM echo --------- Cantidad de Archivos variable ------------- > "tiempo_de_creacion.csv"
+@REM echo Algoritmo;Archivos;Cantidad;Tiempo_Promedio(ns) >> "tiempo_de_creacion.csv"
 
-for /l %%I in (1,1,%REPETICIONES%) do (
-    for %%C in (%CANTIDADES%) do (
-        for %%A in (%ALGORITMOS%) do (
-            for /f "delims=" %%R in ('cmd /c "%EJECUTABLE% %%A %PATRON_FIJO% -f "archivos_de_prueba\%CARPETA%" --patrones -cantidad=%%C "') do (
-                set "RESULTADO=%%R"
-                echo %%A, %%C, repeticion: %%I, !RESULTADO!
-                echo %%A;%CARPETA%;%%C;%PATRON_FIJO%;!RESULTADO! >> "%CSV_ARCHIVOS%"
-            )
-        )
-    )
-)
+@REM for /l %%I in (1,1,%REPETICIONES%) do (
+@REM     for %%C in (%CANTIDADES%) do (
+@REM         for %%A in (%ALGORITMOS%) do (
+@REM             for /f "delims=" %%R in ('cmd /c "%EJECUTABLE% %%A %PATRON_FIJO% -f "archivos_de_prueba\%CARPETA%" --patrones -cantidad=%%C "') do (
+@REM                 set "RESULTADO=%%R"
+@REM                 echo %%A, %%C, repeticion: %%I, !RESULTADO!
+@REM                 echo %%A;%CARPETA%;%%C;%PATRON_FIJO%;!RESULTADO! >> "%CSV_ARCHIVOS%"
+@REM             )
+@REM         )
+@REM     )
+@REM )
 :: -----------------------------
 :: BLOQUE 1 - Patrones variables (20 archivos)
 :: -----------------------------
@@ -52,7 +52,7 @@ echo Algoritmo;Archivos;Cantidad;Tiempo_Promedio(ns) >> "tiempo_de_creacion.csv"
 
 for %%P in (%PATRONES%) do (
     for %%A in (%ALGORITMOS%) do (
-        for /f "delims=" %%R in ('cmd /c "%EJECUTABLE% %%A %%P -f .\archivos_de_prueba\%CARPETA% --patrones -repeticiones=%REPETICIONES% -cantidad=1 "') do (
+        for /f "delims=" %%R in ('cmd /c "%EJECUTABLE% %%A %%P -f .\archivos_de_prueba\%CARPETA% --patrones -repeticiones=%REPETICIONES% -cantidad=20 "') do (
             set "RESULTADO=%%R"
             echo %%A, 20, !RESULTADO!
             echo %%A;%CARPETA%;20;%%P;!RESULTADO! >> "%CSV_PATRONES%"

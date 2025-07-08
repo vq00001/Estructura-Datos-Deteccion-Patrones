@@ -1,5 +1,4 @@
---------- Cantidad de Archivos variable ------------- 
-Algoritmo;Archivos;Cantidad;Tiempo_Promedio(ns) 
+Algoritmo;Archivos;Cantidad;Tiempo_Promedio(ns)
 FM-Index;archivos_de_prueba\Proteins;10;27390944000
 FM-Index;archivos_de_prueba\Proteins;20;58598224000
 FM-Index;archivos_de_prueba\Proteins;30;97882323000
@@ -80,9 +79,14 @@ FM-Index;archivos_de_prueba\Proteins;10;26256567000
 FM-Index;archivos_de_prueba\Proteins;20;56878119000
 FM-Index;archivos_de_prueba\Proteins;30;89663130000
 FM-Index;archivos_de_prueba\Proteins;40;132058153000
---------- Cantidad de Patrones variable ------------- 
-Algoritmo;Archivos;Cantidad;Tiempo_Promedio(ns) 
+Algoritmo;Archivos;Cantidad;Tiempo_Promedio(ns)
 FM-Index;.\archivos_de_prueba\Proteins;1;1495929000
 FM-Index;.\archivos_de_prueba\Proteins;1;1548525000
 FM-Index;.\archivos_de_prueba\Proteins;1;1505110000
 FM-Index;.\archivos_de_prueba\Proteins;1;1481039000
+Suffix-Tree;.\archivos_de_prueba\Proteins\;1;6180200000
+Suffix-Tree;.\archivos_de_prueba\Proteins\;1;6177823000
+Suffix-Tree;.\archivos_de_prueba\Proteins\;2;13494961000
+Suffix-Tree;.\archivos_de_prueba\Proteins\;2;14548073000
+Suffix-Tree;.\archivos_de_prueba\Proteins\;3;32021886000
+Suffix-Tree;.\archivos_de_prueba\Proteins\;2;17825955000

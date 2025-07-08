@@ -24,3 +24,5 @@ Flags adicionales:
 `-r` : Si se usa el programa tambien imprimirá la cantidad de encuentros por archivo (En caso de usar multiples patrones solo imprimirá los del ultimo patron por ahora).
 `-cantidad=<numero>` : Para especificar una cantidad limitada de archivos que queremos concatenar de la carpeta especificada.
 `--patrones` : Para especificar que el patron puesto es el nombre de un archivo con patrones en vez de un patrón en sí.
+`-test`: Para comprobar que las posiciones calculadas coinciden con la ocurrencia del patrón.
+`-repeticiones=<numero>`: Para repetir la consulta del patrón una cierta cantidad de veces y calcular el promedio y varianza.

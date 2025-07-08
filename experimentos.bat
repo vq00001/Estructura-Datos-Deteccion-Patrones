@@ -38,7 +38,7 @@ for /l %%I in (1,1,%REPETICIONES%) do (
         for %%A in (%ALGORITMOS%) do (
             for /f "delims=" %%R in ('cmd /c "%EJECUTABLE% %%A %PATRON_FIJO% -f "archivos_de_prueba\%CARPETA%" --patrones -cantidad=%%C "') do (
                 set "RESULTADO=%%R"
-                echo !RESULTADO!
+                echo %%A, %%C, repeticion: %%I, !RESULTADO!
                 echo %%A;%CARPETA%;%%C;%PATRON_FIJO%;!RESULTADO! >> "%CSV_ARCHIVOS%"
             )
         )
@@ -54,7 +54,7 @@ for %%P in (%PATRONES%) do (
     for %%A in (%ALGORITMOS%) do (
         for /f "delims=" %%R in ('cmd /c "%EJECUTABLE% %%A %%P -f .\archivos_de_prueba\%CARPETA% --patrones -repeticiones=%REPETICIONES% -cantidad=1 "') do (
             set "RESULTADO=%%R"
-            echo !RESULTADO!
+            echo %%A, 20, !RESULTADO!
             echo %%A;%CARPETA%;20;%%P;!RESULTADO! >> "%CSV_PATRONES%"
         )
     )
